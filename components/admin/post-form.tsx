@@ -63,7 +63,7 @@ export function PostForm({ post = null, categories = [] }) {
     defaultValues: post
       ? {
           ...post,
-          categories: post.categories?.map((cat) => cat._id) || [],
+          categories: post.categories?.map((cat) => cat.id) || [],
           publishedAt: post.publishedAt ? new Date(post.publishedAt).toISOString().split("T")[0] : "",
           content: post.content || "",
         }
@@ -209,7 +209,7 @@ export function PostForm({ post = null, categories = [] }) {
                 <FormItem>
                   <FormLabel>Main Image</FormLabel>
                   <FormControl>
-                    <ImageUpload value={field.value} onChange={field.onChange} />
+                    <ImageUpload key={field.value || 'empty'} value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormDescription>
                     This image will be displayed at the top of your post and in listings
@@ -259,7 +259,7 @@ export function PostForm({ post = null, categories = [] }) {
                     <MultiSelect
                       options={categories.map((cat) => ({
                         label: cat.title,
-                        value: cat._id,
+                        value: cat.id,
                       }))}
                       selected={field.value || []}
                       onChange={field.onChange}
