@@ -5,8 +5,11 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { createHash } from "crypto"
 import { prisma } from "@/lib/prisma"
 
+// Initialize Prisma client for auth
+const prismaClient = getPrismaClient()
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(getPrismaClient()),
+  adapter: PrismaAdapter(prismaClient),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",

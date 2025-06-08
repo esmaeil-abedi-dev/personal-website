@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && node scripts/setup-db.js && next build",
+  "buildCommand": "npm install --legacy-peer-deps && npx prisma generate && next build",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
   "outputDirectory": ".next"
