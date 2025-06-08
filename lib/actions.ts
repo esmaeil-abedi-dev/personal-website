@@ -212,17 +212,20 @@ export async function updateAboutPage(data) {
 }
 
 // Image Upload
+import { put } from "@vercel/blob";
+
 export async function uploadImage(file) {
   await checkAuth();
 
-  // This is a placeholder for actual image upload logic
-  // In a real implementation, you would upload to a service like AWS S3, Cloudinary, etc.
+  if (!file) {
+    throw new Error("No file provided for upload.");
+  }
 
-  // For now, we'll simulate an upload and return a placeholder URL
-  // In production, replace this with actual upload logic
-  return `/placeholder.svg?height=400&width=600&text=${encodeURIComponent(
-    file.name
-  )}`;
+  const blob = await put(file.name, file, {
+    access: "public",
+  });
+
+  return blob.url;
 }
 
 // Projects
