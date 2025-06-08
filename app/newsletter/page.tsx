@@ -3,7 +3,7 @@ import { constructMetadata } from "@/lib/metadata";
 import { Suspense } from "react";
 
 export const metadata = constructMetadata({
-  title: "Newsletter - John Doe",
+  title: "Newsletter - Esmaeil Abedi",
   description:
     "Subscribe to my newsletter for updates on new blog posts, projects, and more.",
 });

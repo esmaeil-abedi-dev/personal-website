@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Experience - John Doe",
-  description: "Learn about John Doe's professional experience and skills.",
+  title: "Experience - Esmaeil Abedi",
+  description:
+    "Learn about Esmaeil Abedi's professional experience and skills.",
 };
 
 export default async function ExperiencePage() {

@@ -1,25 +1,26 @@
-import type React from "react"
-import { Inter } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import { SessionProvider } from "@/components/session-provider"
-import { Analytics } from "@/components/analytics"
-import "./globals.css"
-import { Suspense } from "react"
+import type React from "react";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { SessionProvider } from "@/components/session-provider";
+import { Analytics } from "@/components/analytics";
+import "./globals.css";
+import { Suspense } from "react";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "John Doe - Personal Website & Blog",
-  description: "Personal website and blog of John Doe, software developer and writer.",
-    generator: 'v0.dev'
-}
+  title: "Esmaeil Abedi - Personal Website & Blog",
+  description:
+    "Personal website and blog of Esmaeil Abedi, software developer and writer.",
+  generator: "v0.dev",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -40,5 +41,5 @@ export default function RootLayout({
         </Suspense>
       </body>
     </html>
-  )
+  );
 }

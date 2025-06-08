@@ -1,14 +1,18 @@
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-import { prisma } from "@/lib/prisma"
-import { PortableText } from "@/components/portable-text"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { constructMetadata } from "@/lib/metadata"
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { PortableText } from "@/components/portable-text";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { constructMetadata } from "@/lib/metadata";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
   try {
     const post = await prisma.post.findFirst({
       where: {
@@ -21,34 +25,41 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       include: {
         categories: true,
       },
-    })
+    });
 
     if (!post) {
       return constructMetadata({
         title: "Post Not Found",
         description: "The requested blog post could not be found.",
-      })
+      });
     }
 
     return constructMetadata({
-      title: `${post.title} - John Doe's Blog`,
+      title: `${post.title} - Esmaeil Abedi's Blog`,
       description: post.excerpt,
       url: `/blog/${post.slug}`,
       ogImage: post.mainImage,
       type: "article",
       publishedTime: post.publishedAt.toISOString(),
       tags: post.categories?.map((cat) => cat.title) || [],
-    })
+    });
   } catch (error) {
-    console.error(`Error generating metadata for post with slug ${params.slug}:`, error)
+    console.error(
+      `Error generating metadata for post with slug ${params.slug}:`,
+      error
+    );
     return constructMetadata({
       title: "Error Loading Post",
       description: "There was an error loading this blog post.",
-    })
+    });
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   try {
     const post = await prisma.post.findFirst({
       where: {
@@ -61,10 +72,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       include: {
         categories: true,
       },
-    })
+    });
 
     if (!post) {
-      notFound()
+      notFound();
     }
 
     // Generate JSON-LD structured data
@@ -75,15 +86,16 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       description: post.excerpt,
       image: post.mainImage,
       datePublished: post.publishedAt.toISOString(),
-      dateModified: post.updatedAt?.toISOString() || post.publishedAt.toISOString(),
+      dateModified:
+        post.updatedAt?.toISOString() || post.publishedAt.toISOString(),
       author: {
         "@type": "Person",
-        name: "John Doe",
+        name: "Esmaeil Abedi",
         url: "https://yourdomain.com/about",
       },
       publisher: {
         "@type": "Person",
-        name: "John Doe",
+        name: "Esmaeil Abedi",
         logo: {
           "@type": "ImageObject",
           url: "https://yourdomain.com/logo.png",
@@ -94,11 +106,14 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         "@id": `https://yourdomain.com/blog/${post.slug}`,
       },
       keywords: post.categories?.map((cat) => cat.title).join(", "),
-    }
+    };
 
     return (
       <>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <main className="container py-12 md:py-24 lg:py-32">
           <div className="mx-auto max-w-3xl">
             <Link href="/blog">
@@ -116,7 +131,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   </Badge>
                 ))}
               </div>
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">{post.title}</h1>
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {post.title}
+              </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <time dateTime={post.publishedAt.toISOString()}>
                   {new Date(post.publishedAt).toLocaleDateString("en-US", {
@@ -125,7 +142,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                     year: "numeric",
                   })}
                 </time>
-                <div className="text-sm text-muted-foreground">{post.readingTime} min read</div>
+                <div className="text-sm text-muted-foreground">
+                  {post.readingTime} min read
+                </div>
               </div>
             </div>
 
@@ -148,13 +167,15 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
         </main>
       </>
-    )
+    );
   } catch (error) {
-    console.error(`Error loading post with slug ${params.slug}:`, error)
+    console.error(`Error loading post with slug ${params.slug}:`, error);
     return (
       <main className="container py-12 md:py-24 lg:py-32">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Error Loading Post</h1>
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            Error Loading Post
+          </h1>
           <p className="mt-4 text-muted-foreground">
             There was an error loading this blog post. Please try again later.
           </p>
@@ -166,6 +187,6 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </Link>
         </div>
       </main>
-    )
+    );
   }
 }

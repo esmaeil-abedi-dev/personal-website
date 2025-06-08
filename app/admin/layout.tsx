@@ -1,19 +1,23 @@
-import type React from "react"
-import { redirect } from "next/navigation"
-import { getServerAuthSession } from "@/lib/auth"
-import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import type React from "react";
+import { redirect } from "next/navigation";
+import { getServerAuthSession } from "@/lib/auth";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 export const metadata = {
-  title: "Admin Panel - John Doe",
-  description: "Content management system for John Doe's personal website",
-}
+  title: "Admin Panel - Esmaeil Abedi",
+  description: "Content management system for Esmaeil Abedi's personal website",
+};
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerAuthSession()
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getServerAuthSession();
 
   // Redirect to login if not authenticated
   if (!session) {
-    redirect("/api/auth/signin")
+    redirect("/api/auth/signin");
   }
 
   return (
@@ -25,5 +29,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </main>
       </div>
     </div>
-  )
+  );
 }

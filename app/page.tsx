@@ -1,14 +1,14 @@
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowRight, Github, Linkedin, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { HeroAnimation } from "@/components/hero-animation"
-import { NewsletterSection } from "@/components/newsletter-section"
-import { prisma } from "@/lib/prisma"
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { HeroAnimation } from "@/components/hero-animation";
+import { NewsletterSection } from "@/components/newsletter-section";
+import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
   // Fetch latest posts from the database
-  let latestPosts = []
+  let latestPosts = [];
   try {
     latestPosts = await prisma.post.findMany({
       where: {
@@ -24,9 +24,9 @@ export default async function Home() {
       include: {
         categories: true,
       },
-    })
+    });
   } catch (error) {
-    console.error("Error fetching latest posts:", error)
+    console.error("Error fetching latest posts:", error);
   }
 
   return (
@@ -38,11 +38,11 @@ export default async function Home() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Hi, I'm <span className="text-primary">John Doe</span>
+                  Hi, I'm <span className="text-primary">Esmaeil Abedi</span>
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  I'm a software developer passionate about building beautiful, functional, and user-friendly
-                  applications.
+                  I'm a software developer passionate about building beautiful,
+                  functional, and user-friendly applications.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -53,19 +53,30 @@ export default async function Home() {
                   </Button>
                 </Link>
                 <Link href="/blog">
-                  <Button variant="outline" className="w-full min-[400px]:w-auto">
+                  <Button
+                    variant="outline"
+                    className="w-full min-[400px]:w-auto"
+                  >
                     Read my blog
                   </Button>
                 </Link>
               </div>
               <div className="flex items-center gap-4 mt-4">
-                <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <Link
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button variant="ghost" size="icon">
                     <Github className="h-5 w-5" />
                     <span className="sr-only">GitHub</span>
                   </Button>
                 </Link>
-                <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                <Link
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button variant="ghost" size="icon">
                     <Linkedin className="h-5 w-5" />
                     <span className="sr-only">LinkedIn</span>
@@ -91,20 +102,30 @@ export default async function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Latest Articles</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                Latest Articles
+              </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Check out my most recent blog posts on software development, design, and more.
+                Check out my most recent blog posts on software development,
+                design, and more.
               </p>
             </div>
           </div>
           <div className="mx-auto grid gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3 mt-8">
             {latestPosts.length > 0 ? (
               latestPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="group">
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="group"
+                >
                   <div className="space-y-3 rounded-lg border bg-background p-4 transition-all hover:shadow-md">
                     <div className="overflow-hidden rounded-lg">
                       <Image
-                        src={post.mainImage || "/placeholder.svg?height=200&width=400"}
+                        src={
+                          post.mainImage ||
+                          "/placeholder.svg?height=200&width=400"
+                        }
                         alt={post.title}
                         width={400}
                         height={200}
@@ -113,15 +134,21 @@ export default async function Home() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="font-bold">{post.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
-                      <p className="text-xs text-muted-foreground">{new Date(post.publishedAt).toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(post.publishedAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 </Link>
               ))
             ) : (
               <div className="col-span-3 text-center py-12">
-                <p className="text-muted-foreground">No blog posts found. Check back soon!</p>
+                <p className="text-muted-foreground">
+                  No blog posts found. Check back soon!
+                </p>
               </div>
             )}
           </div>
@@ -141,9 +168,12 @@ export default async function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">My Experience</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                My Experience
+              </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                I've worked with various technologies and companies throughout my career.
+                I've worked with various technologies and companies throughout
+                my career.
               </p>
             </div>
           </div>
@@ -152,10 +182,15 @@ export default async function Home() {
               <div className="flex flex-col gap-2 rounded-lg border p-6 transition-all hover:shadow-md">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold">Senior Developer</h3>
-                  <p className="text-sm text-muted-foreground">2020 - Present</p>
+                  <p className="text-sm text-muted-foreground">
+                    2020 - Present
+                  </p>
                 </div>
                 <p className="text-muted-foreground">Tech Company Inc.</p>
-                <p>Led development of multiple web applications using React, Next.js, and Node.js.</p>
+                <p>
+                  Led development of multiple web applications using React,
+                  Next.js, and Node.js.
+                </p>
               </div>
               <div className="flex flex-col gap-2 rounded-lg border p-6 transition-all hover:shadow-md">
                 <div className="flex items-center justify-between">
@@ -163,7 +198,10 @@ export default async function Home() {
                   <p className="text-sm text-muted-foreground">2018 - 2020</p>
                 </div>
                 <p className="text-muted-foreground">Digital Agency Ltd.</p>
-                <p>Developed responsive websites and applications for various clients.</p>
+                <p>
+                  Developed responsive websites and applications for various
+                  clients.
+                </p>
               </div>
             </div>
             <div className="flex justify-center mt-8">
@@ -186,9 +224,12 @@ export default async function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Get in Touch</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                Get in Touch
+              </h2>
               <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Have a project in mind or just want to chat? Feel free to reach out.
+                Have a project in mind or just want to chat? Feel free to reach
+                out.
               </p>
             </div>
             <Link href="/contact">
@@ -201,5 +242,5 @@ export default async function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }

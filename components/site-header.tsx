@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, X, Settings } from "lucide-react"
-import { useState, Suspense } from "react"
-import { useSession } from "next-auth/react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X, Settings } from "lucide-react";
+import { useState, Suspense } from "react";
+import { useSession } from "next-auth/react";
 
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Search } from "@/components/search"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Search } from "@/components/search";
+import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
-  const pathname = usePathname()
-  const { data: session, status } = useSession()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const routes = [
     {
@@ -47,14 +47,14 @@ export function SiteHeader() {
       label: "Contact",
       active: pathname === "/contact",
     },
-  ]
+  ];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="font-bold">
-            John Doe
+            Esmaeil Abedi
           </Link>
           <nav className="hidden md:flex gap-6">
             {routes.map((route) => (
@@ -63,7 +63,7 @@ export function SiteHeader() {
                 href={route.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-primary",
-                  route.active ? "text-primary" : "text-muted-foreground",
+                  route.active ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 {route.label}
@@ -84,9 +84,17 @@ export function SiteHeader() {
             </Link>
           )}
           <ThemeToggle />
-          <Button variant="ghost" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <Button
+            variant="ghost"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             <span className="sr-only">Toggle menu</span>
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </Button>
         </div>
       </div>
@@ -99,7 +107,7 @@ export function SiteHeader() {
                 href={route.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-primary",
-                  route.active ? "text-primary" : "text-muted-foreground",
+                  route.active ? "text-primary" : "text-muted-foreground"
                 )}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -120,5 +128,5 @@ export function SiteHeader() {
         </div>
       )}
     </header>
-  )
+  );
 }

@@ -8,8 +8,9 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Portfolio - John Doe",
-  description: "Explore John Doe's portfolio of software development projects.",
+  title: "Portfolio - Esmaeil Abedi",
+  description:
+    "Explore Esmaeil Abedi's portfolio of software development projects.",
 };
 
 export default async function PortfolioPage() {

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import BlogContent from "./blog-content"; // Import the new component
 
 export const metadata = {
-  title: "Blog - John Doe",
+  title: "Blog - Esmaeil Abedi",
   description:
     "Read my latest articles on software development, design, and more.",
 };

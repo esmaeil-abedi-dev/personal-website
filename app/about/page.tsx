@@ -1,29 +1,30 @@
-import Image from "next/image"
-import { prisma } from "@/lib/prisma"
-import { PortableText } from "@/components/portable-text"
+import Image from "next/image";
+import { prisma } from "@/lib/prisma";
+import { PortableText } from "@/components/portable-text";
 
 export const metadata = {
-  title: "About - John Doe",
-  description: "Learn more about John Doe, software developer and writer.",
-}
+  title: "About - Esmaeil Abedi",
+  description: "Learn more about Esmaeil Abedi, software developer and writer.",
+};
 
 export default async function AboutPage() {
   let about = {
     image: null,
-    shortBio: "Software developer passionate about creating beautiful and functional web applications.",
+    shortBio:
+      "Software developer passionate about creating beautiful and functional web applications.",
     fullBio: [],
-  }
+  };
 
   try {
     const aboutData = await prisma.about.findUnique({
       where: { id: "1" },
-    })
+    });
 
     if (aboutData) {
-      about = aboutData
+      about = aboutData;
     }
   } catch (error) {
-    console.error("Error fetching about page data:", error)
+    console.error("Error fetching about page data:", error);
   }
 
   return (
@@ -34,7 +35,7 @@ export default async function AboutPage() {
             <div className="relative aspect-square overflow-hidden rounded-full border-4 border-primary/20">
               <Image
                 src={about?.image || "/placeholder.svg?height=300&width=300"}
-                alt="John Doe"
+                alt="Esmaeil Abedi"
                 fill
                 className="object-cover"
                 priority
@@ -42,8 +43,12 @@ export default async function AboutPage() {
             </div>
           </div>
           <div className="w-full md:w-2/3 space-y-4">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">About Me</h1>
-            <div className="text-xl text-muted-foreground">{about?.shortBio || "Welcome to my personal website."}</div>
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              About Me
+            </h1>
+            <div className="text-xl text-muted-foreground">
+              {about?.shortBio || "Welcome to my personal website."}
+            </div>
           </div>
         </div>
 
@@ -52,12 +57,14 @@ export default async function AboutPage() {
             <PortableText value={about.fullBio} />
           ) : (
             <p>
-              I'm a passionate software developer with expertise in modern web technologies. I love building
-              user-friendly applications and sharing my knowledge through writing and open-source contributions.
+              I'm a passionate software developer with expertise in modern web
+              technologies. I love building user-friendly applications and
+              sharing my knowledge through writing and open-source
+              contributions.
             </p>
           )}
         </div>
       </div>
     </main>
-  )
+  );
 }
