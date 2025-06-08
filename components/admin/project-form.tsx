@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createProject, updateProject } from "@/lib/actions";
 import { slugify } from "@/lib/utils";
-import { QuillRichTextEditor } from "./quill-rich-text-editor";
+import { TiptapRichTextEditor } from "./tiptap-rich-text-editor";
 
 const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
@@ -225,7 +225,7 @@ export function ProjectForm({ project = null }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <QuillRichTextEditor
+                        <TiptapRichTextEditor
                           value={field.value}
                           onChange={field.onChange}
                         />
