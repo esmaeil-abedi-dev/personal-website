@@ -1,19 +1,20 @@
-import Link from "next/link"
-import Image from "next/image"
-import { FileText, FolderKanban } from "lucide-react"
-import { prisma } from "@/lib/prisma"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SearchForm } from "@/components/search-form"
+import Link from "next/link";
+import Image from "next/image";
+import { FileText, FolderKanban } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SearchForm } from "@/components/search-form";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Search Results",
   description: "Search results for blog posts and projects",
-}
+};
 
 async function getSearchResults(query: string, type?: string) {
   if (!query || query.length < 2) {
-    return { posts: [], projects: [] }
+    return { posts: [], projects: [] };
   }
 
   try {
@@ -47,7 +48,7 @@ async function getSearchResults(query: string, type?: string) {
               publishedAt: "desc",
             },
           })
-        : []
+        : [];
 
     // Search in portfolio projects
     const projects =
@@ -71,45 +72,61 @@ async function getSearchResults(query: string, type?: string) {
             },
             orderBy: [{ featured: "desc" }, { order: "asc" }],
           })
-        : []
+        : [];
 
-    return { posts, projects }
+    return { posts, projects };
   } catch (error) {
-    console.error("Search error:", error)
-    return { posts: [], projects: [] }
+    console.error("Search error:", error);
+    return { posts: [], projects: [] };
   }
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: { q?: string; type?: string } }) {
-  const query = searchParams.q || ""
-  const type = searchParams.type || ""
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: { q?: string; type?: string };
+}) {
+  const query = searchParams.q || "";
+  const type = searchParams.type || "";
 
   if (!query) {
     return (
       <main className="container py-12 md:py-24 lg:py-32">
         <div className="mx-auto max-w-3xl">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-6">Search</h1>
-          <SearchForm initialQuery="" />
-          <p className="mt-8 text-center text-muted-foreground">Enter a search term to find blog posts and projects.</p>
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-6">
+            Search
+          </h1>
+          <Suspense fallback={<div>Loading search results...</div>}>
+            <SearchForm initialQuery="" />
+          </Suspense>
+          <p className="mt-8 text-center text-muted-foreground">
+            Enter a search term to find blog posts and projects.
+          </p>
         </div>
       </main>
-    )
+    );
   }
 
-  const results = await getSearchResults(query, type)
-  const totalResults = results.posts.length + results.projects.length
+  const results = await getSearchResults(query, type);
+  const totalResults = results.posts.length + results.projects.length;
 
-  const activeTab = type === "posts" ? "posts" : type === "projects" ? "projects" : "all"
+  const activeTab =
+    type === "posts" ? "posts" : type === "projects" ? "projects" : "all";
 
   return (
     <main className="container py-12 md:py-24 lg:py-32">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-6">Search Results</h1>
-        <SearchForm initialQuery={query} />
+        <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-6">
+          Search Results
+        </h1>
+        <Suspense fallback={<div>Loading search results...</div>}>
+          <SearchForm initialQuery={query} />
+        </Suspense>
 
         <div className="mt-8">
           <p className="text-muted-foreground mb-6">
-            Found {totalResults} result{totalResults !== 1 ? "s" : ""} for &quot;{query}&quot;
+            Found {totalResults} result{totalResults !== 1 ? "s" : ""} for
+            &quot;{query}&quot;
           </p>
 
           <Tabs defaultValue={activeTab} className="w-full">
@@ -118,19 +135,25 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                 <Link href={`/search?q=${encodeURIComponent(query)}`}>All</Link>
               </TabsTrigger>
               <TabsTrigger value="posts" asChild>
-                <Link href={`/search?q=${encodeURIComponent(query)}&type=posts`}>
+                <Link
+                  href={`/search?q=${encodeURIComponent(query)}&type=posts`}
+                >
                   Blog Posts ({results.posts.length})
                 </Link>
               </TabsTrigger>
               <TabsTrigger value="projects" asChild>
-                <Link href={`/search?q=${encodeURIComponent(query)}&type=projects`}>
+                <Link
+                  href={`/search?q=${encodeURIComponent(query)}&type=projects`}
+                >
                   Projects ({results.projects.length})
                 </Link>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-6 space-y-8">
               {totalResults === 0 ? (
-                <p className="text-center py-12">No results found for &quot;{query}&quot;.</p>
+                <p className="text-center py-12">
+                  No results found for &quot;{query}&quot;.
+                </p>
               ) : (
                 <>
                   {results.posts.length > 0 && (
@@ -138,7 +161,11 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                       <h2 className="text-xl font-bold mb-4">Blog Posts</h2>
                       <div className="space-y-4">
                         {results.posts.map((post: any) => (
-                          <Link key={post.id} href={`/blog/${post.slug}`} className="block">
+                          <Link
+                            key={post.id}
+                            href={`/blog/${post.slug}`}
+                            className="block"
+                          >
                             <div className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50">
                               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
                                 {post.mainImage ? (
@@ -155,9 +182,13 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                               </div>
                               <div>
                                 <h3 className="font-medium">{post.title}</h3>
-                                <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {post.excerpt}
+                                </p>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  {new Date(post.publishedAt).toLocaleDateString()}
+                                  {new Date(
+                                    post.publishedAt
+                                  ).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
@@ -172,7 +203,11 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                       <h2 className="text-xl font-bold mb-4">Projects</h2>
                       <div className="space-y-4">
                         {results.projects.map((project: any) => (
-                          <Link key={project.id} href={`/portfolio/${project.slug}`} className="block">
+                          <Link
+                            key={project.id}
+                            href={`/portfolio/${project.slug}`}
+                            className="block"
+                          >
                             <div className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50">
                               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
                                 {project.image ? (
@@ -189,13 +224,21 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                               </div>
                               <div>
                                 <h3 className="font-medium">{project.title}</h3>
-                                <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {project.description}
+                                </p>
                                 <div className="flex flex-wrap gap-1 mt-1">
-                                  {project.technologies.slice(0, 3).map((tech: string, i: number) => (
-                                    <Badge key={i} variant="secondary" className="text-xs px-1 py-0">
-                                      {tech}
-                                    </Badge>
-                                  ))}
+                                  {project.technologies
+                                    .slice(0, 3)
+                                    .map((tech: string, i: number) => (
+                                      <Badge
+                                        key={i}
+                                        variant="secondary"
+                                        className="text-xs px-1 py-0"
+                                      >
+                                        {tech}
+                                      </Badge>
+                                    ))}
                                   {project.technologies.length > 3 && (
                                     <span className="text-xs text-muted-foreground">
                                       +{project.technologies.length - 3} more
@@ -214,11 +257,17 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
             </TabsContent>
             <TabsContent value="posts" className="mt-6">
               {results.posts.length === 0 ? (
-                <p className="text-center py-12">No blog posts found for &quot;{query}&quot;.</p>
+                <p className="text-center py-12">
+                  No blog posts found for &quot;{query}&quot;.
+                </p>
               ) : (
                 <div className="space-y-4">
                   {results.posts.map((post: any) => (
-                    <Link key={post.id} href={`/blog/${post.slug}`} className="block">
+                    <Link
+                      key={post.id}
+                      href={`/blog/${post.slug}`}
+                      className="block"
+                    >
                       <div className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50">
                         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
                           {post.mainImage ? (
@@ -235,7 +284,9 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                         </div>
                         <div>
                           <h3 className="font-medium">{post.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {post.excerpt}
+                          </p>
                           <p className="text-xs text-muted-foreground mt-1">
                             {new Date(post.publishedAt).toLocaleDateString()}
                           </p>
@@ -248,11 +299,17 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
             </TabsContent>
             <TabsContent value="projects" className="mt-6">
               {results.projects.length === 0 ? (
-                <p className="text-center py-12">No projects found for &quot;{query}&quot;.</p>
+                <p className="text-center py-12">
+                  No projects found for &quot;{query}&quot;.
+                </p>
               ) : (
                 <div className="space-y-4">
                   {results.projects.map((project: any) => (
-                    <Link key={project.id} href={`/portfolio/${project.slug}`} className="block">
+                    <Link
+                      key={project.id}
+                      href={`/portfolio/${project.slug}`}
+                      className="block"
+                    >
                       <div className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50">
                         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
                           {project.image ? (
@@ -269,13 +326,21 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
                         </div>
                         <div>
                           <h3 className="font-medium">{project.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {project.description}
+                          </p>
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {project.technologies.slice(0, 3).map((tech: string, i: number) => (
-                              <Badge key={i} variant="secondary" className="text-xs px-1 py-0">
-                                {tech}
-                              </Badge>
-                            ))}
+                            {project.technologies
+                              .slice(0, 3)
+                              .map((tech: string, i: number) => (
+                                <Badge
+                                  key={i}
+                                  variant="secondary"
+                                  className="text-xs px-1 py-0"
+                                >
+                                  {tech}
+                                </Badge>
+                              ))}
                             {project.technologies.length > 3 && (
                               <span className="text-xs text-muted-foreground">
                                 +{project.technologies.length - 3} more
@@ -293,5 +358,5 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
         </div>
       </div>
     </main>
-  )
+  );
 }
