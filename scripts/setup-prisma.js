@@ -25,8 +25,14 @@ async function setupPrisma() {
     fs.mkdirSync(prismaDir, { recursive: true })
   }
 
+  // Apply database migrations
+  if (!runCommand("npx prisma migrate deploy", "Failed to apply database migrations")) {
+    process.exit(1)
+  }
+
   // Generate Prisma client
-  if (!runCommand("npx prisma generate", "Failed to generate Prisma client")) {
+  // Add --no-engine flag as per plan step 3, will be done in a later step, but good to note here.
+  if (!runCommand("npx prisma generate --no-engine", "Failed to generate Prisma client")) {
     process.exit(1)
   }
 
