@@ -1,15 +1,11 @@
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { getPrismaClient } from "@/lib/prisma"
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { createHash } from "crypto"
 import { prisma } from "@/lib/prisma"
 
-// Initialize Prisma client for auth
-const prismaClient = getPrismaClient()
-
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prismaClient),
+  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",

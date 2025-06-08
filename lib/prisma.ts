@@ -1,29 +1,23 @@
 import { PrismaClient } from "@prisma/client"
 
-// This prevents multiple instances of Prisma Client in development
-const globalForPrisma = global as unknown as {
-  prisma: PrismaClient | undefined
+declare global {
+  var __prisma: PrismaClient | undefined
 }
 
-// Function to create a new PrismaClient with error handling
-function createPrismaClient() {
-  try {
-    return new PrismaClient({
-      log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-    })
-  } catch (error) {
-    console.error("Failed to create Prisma client:", error)
-    throw new Error(
-      "Could not create Prisma Client. Please ensure 'prisma generate' has been run before starting the application.",
-    )
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+let prisma: PrismaClient
+
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient()
+} else {
+  if (!global.__prisma) {
+    global.__prisma = new PrismaClient()
   }
+  prisma = global.__prisma
 }
 
-// Initialize the PrismaClient
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
-
-// Save the client instance in development
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+export { prisma }
 
 // Export a wrapped version of the client to ensure it's initialized
 export function getPrismaClient() {

@@ -1,13 +1,18 @@
 const { execSync } = require("child_process")
 
-// Install dependencies
-console.log("Installing dependencies...")
-execSync("npm install --legacy-peer-deps", { stdio: "inherit" })
+console.log("🚀 Starting build process...")
 
-// Run prisma generate
-console.log("Running Prisma setup...")
-execSync("npx prisma generate", { stdio: "inherit" })
+try {
+  // Generate Prisma client first
+  console.log("📦 Generating Prisma client...")
+  execSync("npx prisma generate", { stdio: "inherit" })
 
-// Run next build
-console.log("Running next build...")
-execSync("npx next build", { stdio: "inherit" })
+  // Run next build
+  console.log("🔨 Building Next.js application...")
+  execSync("npx next build", { stdio: "inherit" })
+
+  console.log("✅ Build completed successfully!")
+} catch (error) {
+  console.error("❌ Build failed:", error)
+  process.exit(1)
+}
