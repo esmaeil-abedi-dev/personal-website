@@ -63,16 +63,11 @@ import { useMobile } from "@/hooks/tiptap/use-mobile";
 import { useWindowSize } from "@/hooks/tiptap/use-window-size";
 import { useCursorVisibility } from "@/hooks/tiptap/use-cursor-visibility";
 
-// --- Components ---
-import { ThemeToggle } from "@/components/tiptap/tiptap-templates/simple/theme-toggle";
-
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
-
-import content from "@/components/tiptap/tiptap-templates/simple/data/content.json";
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -216,7 +211,7 @@ export function SimpleEditor() {
       TrailingNode,
       Link.configure({ openOnClick: false }),
     ],
-    content: content,
+    content: "",
   });
 
   const bodyRect = useCursorVisibility({
