@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
-import 'quill/dist/quill.snow.css'; // Import Quill styles
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect, useRef } from "react";
+import ReactQuill, { Quill } from "react-quill";
+import "quill/dist/quill.snow.css"; // Import Quill styles
+import { cn } from "@/lib/utils";
 
 // Define the props interface
 interface QuillRichTextEditorProps {
@@ -16,27 +16,45 @@ interface QuillRichTextEditorProps {
 // to prevent re-creation on every render, unless they depend on props.
 const modules = {
   toolbar: [
-    [{ 'header': [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-    ['link', 'image', 'code-block'],
-    ['clean'] // remove formatting button
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    ["link", "image", "code-block"],
+    ["clean"], // remove formatting button
   ],
   // Consider adding syntax highlighting for code blocks if needed later
   // syntax: true, // Example: if using quill-syntax module
 };
 
 const formats = [
-  'header',
-  'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'list', 'bullet', 'indent',
-  'link', 'image', 'code-block'
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "image",
+  "code-block",
 ];
 
-export function QuillRichTextEditor({ value, onChange, className }: QuillRichTextEditorProps) {
+export function QuillRichTextEditor({
+  value,
+  onChange,
+  className,
+}: QuillRichTextEditorProps) {
   // Use useEffect to handle server-side rendering and client-side hydration mismatch
   // ReactQuill relies on browser APIs which are not available on the server.
   const [isClient, setIsClient] = useState(false);
+  const ref = useRef(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -46,13 +64,24 @@ export function QuillRichTextEditor({ value, onChange, className }: QuillRichTex
     // Render a placeholder or null on the server
     // You could also render a div with the initial HTML content if needed,
     // but it won't be interactive until the client hydrates.
-    return <div className={cn("border rounded-md p-4 min-h-[200px]", className)} dangerouslySetInnerHTML={{ __html: value }} />;
+    return (
+      <div
+        className={cn("border rounded-md p-4 min-h-[200px]", className)}
+        ref={ref.current}
+        defaultValue={value}
+      />
+    );
   }
 
-  const handleEditorChange = (content: string, delta: any, source: string, editor: any) => {
+  const handleEditorChange = (
+    content: string,
+    delta: any,
+    source: string,
+    editor: any
+  ) => {
     // Quill's onChange provides the HTML content directly if valueType is 'html' (default)
     // However, an empty editor might return '<p><br></p>'. Handle this if you want to store an empty string.
-    if (content === '<p><br></p>') {
+    if (content === "<p><br></p>") {
       onChange("");
     } else {
       onChange(content);
@@ -68,7 +97,7 @@ export function QuillRichTextEditor({ value, onChange, className }: QuillRichTex
         modules={modules}
         formats={formats}
         className="bg-background text-foreground" // Basic styling for theme compatibility
-        style={{ minHeight: '200px' }} // Ensure editor has some default height
+        style={{ minHeight: "200px" }} // Ensure editor has some default height
       />
     </div>
   );
