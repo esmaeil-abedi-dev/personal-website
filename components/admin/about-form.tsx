@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { RichTextEditor } from "@/components/admin/rich-text-editor"
+import { QuillRichTextEditor } from "@/components/admin/quill-rich-text-editor"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { updateAboutPage } from "@/lib/actions"
 
@@ -90,7 +90,7 @@ export function AboutForm({ about = null }) {
                 <FormControl>
                   <Card>
                     <CardContent className="p-0">
-                      <RichTextEditor value={field.value} onChange={field.onChange} />
+                      <QuillRichTextEditor value={field.value ?? ""} onChange={field.onChange} />
                     </CardContent>
                   </Card>
                 </FormControl>

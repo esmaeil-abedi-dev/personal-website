@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { RichTextEditor } from "@/components/admin/rich-text-editor"
+import { QuillRichTextEditor } from "@/components/admin/quill-rich-text-editor"
 import { MultiSelect } from "@/components/admin/multi-select"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { createPost, updatePost } from "@/lib/actions"
@@ -179,7 +179,7 @@ export function PostForm({ post = null, categories = [] }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <RichTextEditor value={field.value} onChange={field.onChange} />
+                        <QuillRichTextEditor value={field.value ?? ""} onChange={field.onChange} />
                       </CardContent>
                     </Card>
                   </FormControl>
