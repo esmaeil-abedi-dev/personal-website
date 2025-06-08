@@ -37,10 +37,13 @@ const formSchema = z.object({
 });
 
 // New component to handle the form logic and useSearchParams
-function LoginFormContent() {
+function LoginFormContent({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
+  const callbackUrl = searchParams?.callbackUrl || "/admin";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -157,7 +160,11 @@ function LoginFormContent() {
   );
 }
 
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 py-12">
       <Suspense
@@ -169,7 +176,7 @@ export default function LoginPage() {
           </div>
         }
       >
-        <LoginFormContent />
+        <LoginFormContent searchParams={searchParams} />
       </Suspense>
     </div>
   );
