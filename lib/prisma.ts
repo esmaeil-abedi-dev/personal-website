@@ -11,3 +11,8 @@ export const prisma =
   })
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+
+// Export a wrapped version of the client to ensure it's initialized
+export function getPrismaClient() {
+  return prisma
+}

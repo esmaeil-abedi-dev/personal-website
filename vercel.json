@@ -1,14 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "prisma": {
-          "generate": true
-        }
-      }
-    }
-  ],
-  "buildCommand": "node scripts/setup-prisma.js && next build"
+  "buildCommand": "node scripts/setup-db.js && next build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next"
 }
