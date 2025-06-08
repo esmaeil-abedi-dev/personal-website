@@ -1,32 +1,52 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Loader2, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { TiptapRichTextEditor } from "@/components/admin/tiptap-rich-text-editor"
-import { MultiSelect } from "@/components/admin/multi-select"
-import { ImageUpload } from "@/components/admin/image-upload"
-import { createPost, updatePost } from "@/lib/actions"
-import { slugify } from "@/lib/utils"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Loader2, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import TiptapRichTextEditor from "@/components/admin/tiptap-rich-text-editor";
+import { MultiSelect } from "@/components/admin/multi-select";
+import { ImageUpload } from "@/components/admin/image-upload";
+import { createPost, updatePost } from "@/lib/actions";
+import { slugify } from "@/lib/utils";
 
 const formSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters.").max(100, "Title must be less than 100 characters."),
+  title: z
+    .string()
+    .min(5, "Title must be at least 5 characters.")
+    .max(100, "Title must be less than 100 characters."),
   slug: z
     .string()
     .min(5, "Slug must be at least 5 characters.")
     .max(100, "Slug must be less than 100 characters.")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must contain only lowercase letters, numbers, and hyphens."),
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "Slug must contain only lowercase letters, numbers, and hyphens."
+    ),
   excerpt: z
     .string()
     .min(10, "Excerpt must be at least 10 characters.")
@@ -49,14 +69,14 @@ const formSchema = z.object({
     .int()
     .min(1, "Reading time must be at least 1 minute.")
     .max(60, "Reading time must be less than 60 minutes."),
-})
+});
 
 export function PostForm({ post = null, categories = [] }) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [activeTab, setActiveTab] = useState("content")
-  const [validationErrors, setValidationErrors] = useState([])
-  const [autoSlug, setAutoSlug] = useState(!post?.slug)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("content");
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [autoSlug, setAutoSlug] = useState(!post?.slug);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -64,7 +84,9 @@ export function PostForm({ post = null, categories = [] }) {
       ? {
           ...post,
           categories: post.categories?.map((cat) => cat.id) || [],
-          publishedAt: post.publishedAt ? new Date(post.publishedAt).toISOString().split("T")[0] : "",
+          publishedAt: post.publishedAt
+            ? new Date(post.publishedAt).toISOString().split("T")[0]
+            : "",
           content: post.content || "",
         }
       : {
@@ -78,60 +100,66 @@ export function PostForm({ post = null, categories = [] }) {
           publishedAt: "",
           readingTime: 5,
         },
-  })
+  });
 
   // Auto-generate slug from title
   useEffect(() => {
     if (autoSlug) {
-      const title = form.watch("title")
+      const title = form.watch("title");
       if (title) {
-        form.setValue("slug", slugify(title))
+        form.setValue("slug", slugify(title));
       }
     }
-  }, [form.watch("title"), autoSlug, form])
+  }, [form.watch("title"), autoSlug, form]);
 
   // Validate content length
   useEffect(() => {
-    const content = form.watch("content")
-    const errors = []
+    const content = form.watch("content");
+    const errors = [];
 
     if (content) {
       // Check for minimum content length (excluding HTML tags)
-      const textContent = content.replace(/<[^>]*>/g, "")
+      const textContent = content.replace(/<[^>]*>/g, "");
       if (textContent.length < 50) {
-        errors.push("Content text should be at least 50 characters.")
+        errors.push("Content text should be at least 50 characters.");
       }
     }
 
     // Check for images
     if (!content.includes("<img") && form.watch("status") === "published") {
-      errors.push("Published posts should include at least one image.")
+      errors.push("Published posts should include at least one image.");
     }
 
     // Check for headings
-    if (!content.includes("<h2") && !content.includes("<h3") && content.length > 500) {
-      errors.push("Longer posts should include headings (h2 or h3) for better readability.")
+    if (
+      !content.includes("<h2") &&
+      !content.includes("<h3") &&
+      content.length > 500
+    ) {
+      errors.push(
+        "Longer posts should include headings (h2 or h3) for better readability."
+      );
     }
 
-    setValidationErrors(errors)
-  }, [form.watch("content"), form.watch("status"), form])
+    setValidationErrors(errors);
+  }, [form.watch("content"), form.watch("status"), form]);
 
   const onSubmit = async (values) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       if (post) {
-        await updatePost(post._id, values)
+        await updatePost(post._id, values);
       } else {
-        await createPost(values)
+        await createPost(values);
       }
-      router.push("/admin/posts")
-      router.refresh()
+      router.push("/admin/posts");
+      router.refresh();
     } catch (error) {
-      console.error("Error saving post:", error)
+      console.error("Error saving post:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -163,9 +191,16 @@ export function PostForm({ post = null, categories = [] }) {
                 <FormItem>
                   <FormLabel>Excerpt</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Brief summary of the post" className="resize-none" {...field} />
+                    <Textarea
+                      placeholder="Brief summary of the post"
+                      className="resize-none"
+                      {...field}
+                    />
                   </FormControl>
-                  <FormDescription>A short summary that appears in blog listings (max 200 characters)</FormDescription>
+                  <FormDescription>
+                    A short summary that appears in blog listings (max 200
+                    characters)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -179,7 +214,10 @@ export function PostForm({ post = null, categories = [] }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <TiptapRichTextEditor value={field.value ?? ""} onChange={field.onChange} />
+                        <TiptapRichTextEditor
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                        />
                       </CardContent>
                     </Card>
                   </FormControl>
@@ -209,10 +247,15 @@ export function PostForm({ post = null, categories = [] }) {
                 <FormItem>
                   <FormLabel>Main Image</FormLabel>
                   <FormControl>
-                    <ImageUpload key={field.value || 'empty'} value={field.value} onChange={field.onChange} />
+                    <ImageUpload
+                      key={field.value || "empty"}
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormDescription>
-                    This image will be displayed at the top of your post and in listings
+                    This image will be displayed at the top of your post and in
+                    listings
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -232,9 +275,12 @@ export function PostForm({ post = null, categories = [] }) {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setAutoSlug(!autoSlug)
+                        setAutoSlug(!autoSlug);
                         if (!autoSlug) {
-                          form.setValue("slug", slugify(form.getValues("title")))
+                          form.setValue(
+                            "slug",
+                            slugify(form.getValues("title"))
+                          );
                         }
                       }}
                     >
@@ -242,9 +288,15 @@ export function PostForm({ post = null, categories = [] }) {
                     </Button>
                   </div>
                   <FormControl>
-                    <Input placeholder="post-slug" {...field} readOnly={autoSlug} />
+                    <Input
+                      placeholder="post-slug"
+                      {...field}
+                      readOnly={autoSlug}
+                    />
                   </FormControl>
-                  <FormDescription>The URL-friendly version of the title</FormDescription>
+                  <FormDescription>
+                    The URL-friendly version of the title
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -276,7 +328,10 @@ export function PostForm({ post = null, categories = [] }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -312,9 +367,15 @@ export function PostForm({ post = null, categories = [] }) {
                 <FormItem>
                   <FormLabel>Publication Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} max={new Date().toISOString().split("T")[0]} />
+                    <Input
+                      type="date"
+                      {...field}
+                      max={new Date().toISOString().split("T")[0]}
+                    />
                   </FormControl>
-                  <FormDescription>Leave empty for drafts. Cannot be in the future.</FormDescription>
+                  <FormDescription>
+                    Leave empty for drafts. Cannot be in the future.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -323,12 +384,20 @@ export function PostForm({ post = null, categories = [] }) {
         </Tabs>
 
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => router.push("/admin/posts")}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/posts")}
+          >
             Cancel
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || (validationErrors.length > 0 && form.watch("status") === "published")}
+            disabled={
+              isSubmitting ||
+              (validationErrors.length > 0 &&
+                form.watch("status") === "published")
+            }
           >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {post ? "Update Post" : "Create Post"}
@@ -336,5 +405,5 @@ export function PostForm({ post = null, categories = [] }) {
         </div>
       </form>
     </Form>
-  )
+  );
 }

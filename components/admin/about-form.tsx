@@ -1,28 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { TiptapRichTextEditor } from "@/components/admin/tiptap-rich-text-editor"
-import { ImageUpload } from "@/components/admin/image-upload"
-import { updateAboutPage } from "@/lib/actions"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import TiptapRichTextEditor from "@/components/admin/tiptap-rich-text-editor";
+import { ImageUpload } from "@/components/admin/image-upload";
+import { updateAboutPage } from "@/lib/actions";
 
 const formSchema = z.object({
-  shortBio: z.string().min(1, "Short bio is required").max(300, "Short bio must be less than 300 characters"),
+  shortBio: z
+    .string()
+    .min(1, "Short bio is required")
+    .max(300, "Short bio must be less than 300 characters"),
   fullBio: z.any(),
   image: z.string().optional(),
-})
+});
 
 export function AboutForm({ about = null }) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -31,19 +42,19 @@ export function AboutForm({ about = null }) {
       fullBio: "",
       image: "",
     },
-  })
+  });
 
   const onSubmit = async (values) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      await updateAboutPage(values)
-      router.refresh()
+      await updateAboutPage(values);
+      router.refresh();
     } catch (error) {
-      console.error("Error saving about page:", error)
+      console.error("Error saving about page:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -57,10 +68,15 @@ export function AboutForm({ about = null }) {
                 <FormItem>
                   <FormLabel>Short Bio</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Brief introduction" className="resize-none h-32" {...field} />
+                    <Textarea
+                      placeholder="Brief introduction"
+                      className="resize-none h-32"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
-                    A brief introduction that appears at the top of your about page (max 300 characters)
+                    A brief introduction that appears at the top of your about
+                    page (max 300 characters)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -73,9 +89,14 @@ export function AboutForm({ about = null }) {
                 <FormItem className="mt-8">
                   <FormLabel>Profile Image</FormLabel>
                   <FormControl>
-                    <ImageUpload value={field.value} onChange={field.onChange} />
+                    <ImageUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
-                  <FormDescription>Your profile picture for the about page</FormDescription>
+                  <FormDescription>
+                    Your profile picture for the about page
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -90,12 +111,16 @@ export function AboutForm({ about = null }) {
                 <FormControl>
                   <Card>
                     <CardContent className="p-0">
-                      <TiptapRichTextEditor value={field.value ?? ""} onChange={field.onChange} />
+                      <TiptapRichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                      />
                     </CardContent>
                   </Card>
                 </FormControl>
                 <FormDescription>
-                  Your complete biography with details about your background, interests, and career
+                  Your complete biography with details about your background,
+                  interests, and career
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -111,5 +136,5 @@ export function AboutForm({ about = null }) {
         </div>
       </form>
     </Form>
-  )
+  );
 }
