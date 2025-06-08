@@ -35,7 +35,9 @@ export default function RootLayout({
             </div>
           </ThemeProvider>
         </SessionProvider>
-        <Analytics />
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   )
