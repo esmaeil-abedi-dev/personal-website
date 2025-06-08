@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, Settings } from "lucide-react"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useSession } from "next-auth/react"
 
 import { Button } from "@/components/ui/button"
@@ -72,7 +72,9 @@ export function SiteHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Search />
+          <Suspense fallback={null}>
+            <Search />
+          </Suspense>
           {status === "authenticated" && session && (
             <Link href="/admin">
               <Button variant="ghost" size="icon" title="Admin Panel">
