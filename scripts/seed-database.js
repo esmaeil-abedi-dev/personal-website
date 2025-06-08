@@ -1,14 +1,16 @@
-const { PrismaClient } = require("@prisma/client")
-const { createHash } = require("crypto")
+const { PrismaClient } = require("@prisma/client");
+const { createHash } = require("crypto");
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function seedDatabase() {
   try {
-    console.log("🌱 Seeding database...")
+    console.log("🌱 Seeding database...");
 
     // Create admin user
-    const hashedPassword = createHash("sha256").update("admin123").digest("hex")
+    const hashedPassword = createHash("sha256")
+      .update("admin123")
+      .digest("hex");
 
     const admin = await prisma.user.upsert({
       where: { email: "admin@example.com" },
@@ -18,7 +20,7 @@ async function seedDatabase() {
         email: "admin@example.com",
         password: hashedPassword,
       },
-    })
+    });
 
     // Create categories
     const categories = await Promise.all([
@@ -49,7 +51,7 @@ async function seedDatabase() {
           description: "React development guides",
         },
       }),
-    ])
+    ]);
 
     // Create sample blog post
     const samplePost = await prisma.post.upsert({
@@ -78,7 +80,7 @@ async function seedDatabase() {
           connect: [{ id: categories[0].id }],
         },
       },
-    })
+    });
 
     // Create sample experience
     const sampleExperience = await prisma.experience.upsert({
@@ -92,9 +94,15 @@ async function seedDatabase() {
         endDate: "Present",
         description:
           "Led development of multiple web applications using React, Next.js, and Node.js. Collaborated with cross-functional teams to deliver high-quality software solutions.",
-        technologies: ["React", "Next.js", "Node.js", "TypeScript", "PostgreSQL"],
+        technologies: [
+          "React",
+          "Next.js",
+          "Node.js",
+          "TypeScript",
+          "PostgreSQL",
+        ],
       },
-    })
+    });
 
     // Create sample skills
     const sampleSkills = await prisma.skillCategory.upsert({
@@ -103,10 +111,17 @@ async function seedDatabase() {
       create: {
         id: "frontend-skills",
         category: "Frontend Development",
-        skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "HTML", "CSS"],
+        skills: [
+          "React",
+          "Next.js",
+          "TypeScript",
+          "Tailwind CSS",
+          "HTML",
+          "CSS",
+        ],
         order: 1,
       },
-    })
+    });
 
     // Create sample project
     const sampleProject = await prisma.project.upsert({
@@ -115,7 +130,8 @@ async function seedDatabase() {
       create: {
         title: "Personal Website",
         slug: "personal-website",
-        description: "A modern personal website built with Next.js and Tailwind CSS",
+        description:
+          "A modern personal website built with Next.js and Tailwind CSS",
         content: `
           <h2>Project Overview</h2>
           <p>This is my personal website built with modern web technologies.</p>
@@ -127,11 +143,17 @@ async function seedDatabase() {
             <li>Admin panel</li>
           </ul>
         `,
-        technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma"],
+        technologies: [
+          "Next.js",
+          "React",
+          "TypeScript",
+          "Tailwind CSS",
+          "Prisma",
+        ],
         featured: true,
         order: 1,
       },
-    })
+    });
 
     // Create about page content
     const aboutContent = await prisma.about.upsert({
@@ -139,25 +161,26 @@ async function seedDatabase() {
       update: {},
       create: {
         id: "1",
-        shortBio: "I'm a passionate software developer with expertise in modern web technologies.",
+        shortBio:
+          "I'm a passionate software developer with expertise in modern web technologies.",
         fullBio: `
           <p>Hello! I'm a software developer passionate about creating beautiful, functional, and user-friendly applications.</p>
           <p>I have experience working with various technologies including React, Next.js, Node.js, and PostgreSQL. I love learning new technologies and sharing my knowledge with others.</p>
           <p>When I'm not coding, you can find me reading tech blogs, contributing to open source projects, or exploring new places.</p>
         `,
       },
-    })
+    });
 
-    console.log("✅ Database seeded successfully!")
-    console.log("📧 Admin email: admin@example.com")
-    console.log("🔑 Admin password: admin123")
-    console.log("⚠️  Please change the admin password after first login!")
+    console.log("✅ Database seeded successfully!");
+    console.log("📧 Admin email: admin@example.com");
+    console.log("🔑 Admin password: admin123");
+    console.log("⚠️  Please change the admin password after first login!");
   } catch (error) {
-    console.error("❌ Error seeding database:", error)
-    throw error
+    console.error("❌ Error seeding database:", error);
+    throw error;
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }
 
-seedDatabase()
+seedDatabase();
