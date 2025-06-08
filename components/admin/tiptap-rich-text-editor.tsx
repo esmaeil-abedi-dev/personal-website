@@ -4,6 +4,7 @@ import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import React, { useEffect } from "react";
+import { SimpleEditor } from "./editor";
 
 interface TiptapRichTextEditorProps {
   value: string;
@@ -75,7 +76,9 @@ const TiptapRichTextEditor: React.FC<TiptapRichTextEditorProps> = ({
       onClick={onClick}
       title={title}
       className={`px-2 py-1 m-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${
-        isActive ? "bg-gray-300 dark:bg-gray-600" : "bg-gray-100 dark:bg-gray-800"
+        isActive
+          ? "bg-gray-300 dark:bg-gray-600"
+          : "bg-gray-100 dark:bg-gray-800"
       }`}
     >
       {children}
@@ -89,72 +92,7 @@ const TiptapRichTextEditor: React.FC<TiptapRichTextEditorProps> = ({
     }
   };
 
-  return (
-    <div className={`border border-gray-300 dark:border-gray-700 rounded-md ${className}`}>
-      <div className="toolbar p-1 bg-gray-50 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700 flex flex-wrap items-center">
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          isActive={editor.isActive("bold")}
-          title="Bold"
-        >
-          B
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          isActive={editor.isActive("italic")}
-          title="Italic"
-        >
-          I
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          isActive={editor.isActive("heading", { level: 1 })}
-          title="H1"
-        >
-          H1
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          isActive={editor.isActive("heading", { level: 2 })}
-          title="H2"
-        >
-          H2
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          isActive={editor.isActive("heading", { level: 3 })}
-          title="H3"
-        >
-          H3
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          isActive={editor.isActive("bulletList")}
-          title="Bullet List"
-        >
-          UL
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          isActive={editor.isActive("orderedList")}
-          title="Ordered List"
-        >
-          OL
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          isActive={editor.isActive("codeBlock")}
-          title="Code Block"
-        >
-          Code
-        </ToolbarButton>
-        <ToolbarButton onClick={addImage} title="Add Image">
-          Img
-        </ToolbarButton>
-      </div>
-      <EditorContent editor={editor} className="p-2 min-h-[150px] prose dark:prose-invert max-w-full"/>
-    </div>
-  );
+  return <SimpleEditor />;
 };
 
 export default TiptapRichTextEditor;
