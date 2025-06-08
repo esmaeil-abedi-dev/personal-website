@@ -1,47 +1,47 @@
-import * as React from "react"
-import { isNodeSelection, type Editor } from "@tiptap/react"
+import * as React from "react";
+import { isNodeSelection, type Editor } from "@tiptap/react";
 
 // --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapEditor } from "@/hooks/tiptap/use-tiptap-editor";
 
 // --- Icons ---
-import { ListIcon } from "@/components/tiptap-icons/list-icon"
-import { ListOrderedIcon } from "@/components/tiptap-icons/list-ordered-icon"
-import { ListTodoIcon } from "@/components/tiptap-icons/list-todo-icon"
+import { ListIcon } from "@/components/tiptap/tiptap-icons/list-icon";
+import { ListOrderedIcon } from "@/components/tiptap/tiptap-icons/list-ordered-icon";
+import { ListTodoIcon } from "@/components/tiptap/tiptap-icons/list-todo-icon";
 
 // --- Lib ---
-import { isNodeInSchema } from "@/lib/tiptap-utils"
+import { isNodeInSchema } from "@/lib/tiptap-utils";
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@/components/tiptap-ui-primitive/button"
-import { Button } from "@/components/tiptap-ui-primitive/button"
+import type { ButtonProps } from "@/components/tiptap/tiptap-ui-primitive/button";
+import { Button } from "@/components/tiptap/tiptap-ui-primitive/button";
 
-export type ListType = "bulletList" | "orderedList" | "taskList"
+export type ListType = "bulletList" | "orderedList" | "taskList";
 
 export interface ListOption {
-  label: string
-  type: ListType
-  icon: React.ElementType
+  label: string;
+  type: ListType;
+  icon: React.ElementType;
 }
 
 export interface ListButtonProps extends Omit<ButtonProps, "type"> {
   /**
    * The TipTap editor instance.
    */
-  editor?: Editor | null
+  editor?: Editor | null;
   /**
    * The type of list to toggle.
    */
-  type: ListType
+  type: ListType;
   /**
    * Optional text to display alongside the icon.
    */
-  text?: string
+  text?: string;
   /**
    * Whether the button should hide when the list is not available.
    * @default false
    */
-  hideWhenUnavailable?: boolean
+  hideWhenUnavailable?: boolean;
 }
 
 export const listOptions: ListOption[] = [
@@ -60,76 +60,76 @@ export const listOptions: ListOption[] = [
     type: "taskList",
     icon: ListTodoIcon,
   },
-]
+];
 
 export const listShortcutKeys: Record<ListType, string> = {
   bulletList: "Ctrl-Shift-8",
   orderedList: "Ctrl-Shift-7",
   taskList: "Ctrl-Shift-9",
-}
+};
 
 export function canToggleList(editor: Editor | null, type: ListType): boolean {
   if (!editor) {
-    return false
+    return false;
   }
 
   switch (type) {
     case "bulletList":
-      return editor.can().toggleBulletList()
+      return editor.can().toggleBulletList();
     case "orderedList":
-      return editor.can().toggleOrderedList()
+      return editor.can().toggleOrderedList();
     case "taskList":
-      return editor.can().toggleList("taskList", "taskItem")
+      return editor.can().toggleList("taskList", "taskItem");
     default:
-      return false
+      return false;
   }
 }
 
 export function isListActive(editor: Editor | null, type: ListType): boolean {
-  if (!editor) return false
+  if (!editor) return false;
 
   switch (type) {
     case "bulletList":
-      return editor.isActive("bulletList")
+      return editor.isActive("bulletList");
     case "orderedList":
-      return editor.isActive("orderedList")
+      return editor.isActive("orderedList");
     case "taskList":
-      return editor.isActive("taskList")
+      return editor.isActive("taskList");
     default:
-      return false
+      return false;
   }
 }
 
 export function toggleList(editor: Editor | null, type: ListType): void {
-  if (!editor) return
+  if (!editor) return;
 
   switch (type) {
     case "bulletList":
-      editor.chain().focus().toggleBulletList().run()
-      break
+      editor.chain().focus().toggleBulletList().run();
+      break;
     case "orderedList":
-      editor.chain().focus().toggleOrderedList().run()
-      break
+      editor.chain().focus().toggleOrderedList().run();
+      break;
     case "taskList":
-      editor.chain().focus().toggleList("taskList", "taskItem").run()
-      break
+      editor.chain().focus().toggleList("taskList", "taskItem").run();
+      break;
   }
 }
 
 export function getListOption(type: ListType): ListOption | undefined {
-  return listOptions.find((option) => option.type === type)
+  return listOptions.find((option) => option.type === type);
 }
 
 export function shouldShowListButton(params: {
-  editor: Editor | null
-  type: ListType
-  hideWhenUnavailable: boolean
-  listInSchema: boolean
+  editor: Editor | null;
+  type: ListType;
+  hideWhenUnavailable: boolean;
+  listInSchema: boolean;
 }): boolean {
-  const { editor, type, hideWhenUnavailable, listInSchema } = params
+  const { editor, type, hideWhenUnavailable, listInSchema } = params;
 
   if (!listInSchema || !editor) {
-    return false
+    return false;
   }
 
   if (hideWhenUnavailable) {
@@ -137,25 +137,25 @@ export function shouldShowListButton(params: {
       isNodeSelection(editor.state.selection) ||
       !canToggleList(editor, type)
     ) {
-      return false
+      return false;
     }
   }
 
-  return true
+  return true;
 }
 
 export function useListState(editor: Editor | null, type: ListType) {
-  const listInSchema = isNodeInSchema(type, editor)
-  const listOption = getListOption(type)
-  const isActive = isListActive(editor, type)
-  const shortcutKey = listShortcutKeys[type]
+  const listInSchema = isNodeInSchema(type, editor);
+  const listOption = getListOption(type);
+  const isActive = isListActive(editor, type);
+  const shortcutKey = listShortcutKeys[type];
 
   return {
     listInSchema,
     listOption,
     isActive,
     shortcutKey,
-  }
+  };
 }
 
 export const ListButton = React.forwardRef<HTMLButtonElement, ListButtonProps>(
@@ -172,24 +172,24 @@ export const ListButton = React.forwardRef<HTMLButtonElement, ListButtonProps>(
     },
     ref
   ) => {
-    const editor = useTiptapEditor(providedEditor)
+    const editor = useTiptapEditor(providedEditor);
     const { listInSchema, listOption, isActive, shortcutKey } = useListState(
       editor,
       type
-    )
+    );
 
-    const Icon = listOption?.icon || ListIcon
+    const Icon = listOption?.icon || ListIcon;
 
     const handleClick = React.useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
-        onClick?.(e)
+        onClick?.(e);
 
         if (!e.defaultPrevented && editor) {
-          toggleList(editor, type)
+          toggleList(editor, type);
         }
       },
       [onClick, editor, type]
-    )
+    );
 
     const show = React.useMemo(() => {
       return shouldShowListButton({
@@ -197,11 +197,11 @@ export const ListButton = React.forwardRef<HTMLButtonElement, ListButtonProps>(
         type,
         hideWhenUnavailable,
         listInSchema,
-      })
-    }, [editor, type, hideWhenUnavailable, listInSchema])
+      });
+    }, [editor, type, hideWhenUnavailable, listInSchema]);
 
     if (!show || !editor || !editor.isEditable) {
-      return null
+      return null;
     }
 
     return (
@@ -227,10 +227,10 @@ export const ListButton = React.forwardRef<HTMLButtonElement, ListButtonProps>(
           </>
         )}
       </Button>
-    )
+    );
   }
-)
+);
 
-ListButton.displayName = "ListButton"
+ListButton.displayName = "ListButton";
 
-export default ListButton
+export default ListButton;

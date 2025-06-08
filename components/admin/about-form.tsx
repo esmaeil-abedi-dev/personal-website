@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import TiptapRichTextEditor from "@/components/admin/tiptap-rich-text-editor";
+import { SimpleEditor } from "@/components/admin/editor";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { updateAboutPage } from "@/lib/actions";
 
@@ -111,7 +111,7 @@ export function AboutForm({ about = null }) {
                 <FormControl>
                   <Card>
                     <CardContent className="p-0">
-                      <TiptapRichTextEditor
+                      <SimpleEditor
                         value={field.value ?? ""}
                         onChange={field.onChange}
                       />

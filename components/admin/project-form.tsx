@@ -27,8 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createProject, updateProject } from "@/lib/actions";
 import { slugify } from "@/lib/utils";
-import { TiptapRichTextEditor } from "./tiptap-rich-text-editor";
-
+import { SimpleEditor } from "./editor";
 const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
 const formSchema = z.object({
@@ -225,7 +224,7 @@ export function ProjectForm({ project = null }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <TiptapRichTextEditor
+                        <SimpleEditor
                           value={field.value}
                           onChange={field.onChange}
                         />

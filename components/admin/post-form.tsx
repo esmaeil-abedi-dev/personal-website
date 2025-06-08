@@ -28,7 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import TiptapRichTextEditor from "@/components/admin/tiptap-rich-text-editor";
+import { SimpleEditor } from "@/components/admin/editor";
 import { MultiSelect } from "@/components/admin/multi-select";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createPost, updatePost } from "@/lib/actions";
@@ -214,7 +214,7 @@ export function PostForm({ post = null, categories = [] }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <TiptapRichTextEditor
+                        <SimpleEditor
                           value={field.value ?? ""}
                           onChange={field.onChange}
                         />
