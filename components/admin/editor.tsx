@@ -29,10 +29,10 @@ import {
 
 // --- Tiptap Node ---
 import { ImageUploadNode } from "@/components/tiptap/tiptap-node/image-upload-node/image-upload-node-extension";
-import "@/components/tiptap-node/code-block-node/code-block-node.scss";
-import "@/components/tiptap-node/list-node/list-node.scss";
-import "@/components/tiptap-node/image-node/image-node.scss";
-import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
+import "@/components/tiptap/tiptap-node/code-block-node/code-block-node.scss";
+import "@/components/tiptap/tiptap-node/list-node/list-node.scss";
+import "@/components/tiptap/tiptap-node/image-node/image-node.scss";
+import "@/components/tiptap/tiptap-node/paragraph-node/paragraph-node.scss";
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap/tiptap-ui/heading-dropdown-menu";
@@ -67,7 +67,7 @@ import { useCursorVisibility } from "@/hooks/tiptap/use-cursor-visibility";
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
-import "@/components/tiptap-templates/simple/simple-editor.scss";
+import "@/components/tiptap/tiptap-templates/simple/simple-editor.scss";
 
 const MainToolbarContent = ({
   onHighlighterClick,
