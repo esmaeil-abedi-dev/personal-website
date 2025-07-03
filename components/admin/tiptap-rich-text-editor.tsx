@@ -4,7 +4,7 @@ import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import React, { useEffect } from "react";
-import { SimpleEditor } from "./editor";
+import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
 
 interface TiptapRichTextEditorProps {
   value: string;
