@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import './styles/_keyframe-animations.css';
-@import './styles/_variables.scss';
+@import './styles/_variables.css';
 
 
 
