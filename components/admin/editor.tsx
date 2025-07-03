@@ -212,8 +212,10 @@ export function SimpleEditor({ value, onChange }) {
       Link.configure({ openOnClick: false }),
     ],
     content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+    onTransaction: ({ editor, transaction }) => {
+      if (transaction.docChanged) {
+        onChange(editor.getHTML());
+      }
     },
   });
 
