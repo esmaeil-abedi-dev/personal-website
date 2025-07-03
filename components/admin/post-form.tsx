@@ -1,409 +1,193 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
-import { MultiSelect } from "@/components/admin/multi-select";
-import { ImageUpload } from "@/components/admin/image-upload";
-import { createPost, updatePost } from "@/lib/actions";
-import { slugify } from "@/lib/utils";
+import type React from "react"
 
-const formSchema = z.object({
-  title: z
-    .string()
-    .min(5, "Title must be at least 5 characters.")
-    .max(100, "Title must be less than 100 characters."),
-  slug: z
-    .string()
-    .min(5, "Slug must be at least 5 characters.")
-    .max(100, "Slug must be less than 100 characters.")
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must contain only lowercase letters, numbers, and hyphens."
-    ),
-  excerpt: z
-    .string()
-    .min(10, "Excerpt must be at least 10 characters.")
-    .max(200, "Excerpt must be less than 200 characters."),
-  content: z.string().min(50, "Content must be at least 50 characters."),
-  mainImage: z.string().optional(),
-  categories: z.array(z.string()).min(1, "At least one category is required."),
-  status: z.enum(["draft", "published"]),
-  publishedAt: z
-    .string()
-    .optional()
-    .refine((val) => !val || new Date(val) <= new Date(), {
-      message: "Publication date cannot be in the future.",
-    })
-    .refine((val) => !val || !isNaN(new Date(val).getTime()), {
-      message: "Invalid date format.",
-    }),
-  readingTime: z.coerce
-    .number()
-    .int()
-    .min(1, "Reading time must be at least 1 minute.")
-    .max(60, "Reading time must be less than 60 minutes."),
-});
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { createPost, updatePost } from "@/lib/actions"
+import { slugify } from "@/lib/utils"
+import { MultiSelect } from "./multi-select"
+import { ImageUpload } from "./image-upload"
+import TiptapRichTextEditor from "./tiptap-rich-text-editor"
 
-export function PostForm({ post = null, categories = [] }) {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("content");
-  const [validationErrors, setValidationErrors] = useState([]);
-  const [autoSlug, setAutoSlug] = useState(!post?.slug);
+interface PostFormProps {
+  post?: any
+  categories: any[]
+}
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: post
-      ? {
-          ...post,
-          categories: post.categories?.map((cat) => cat.id) || [],
-          publishedAt: post.publishedAt
-            ? new Date(post.publishedAt).toISOString().split("T")[0]
-            : "",
-          content: post.content || "",
-        }
-      : {
-          title: "",
-          slug: "",
-          excerpt: "",
-          content: "",
-          mainImage: "",
-          categories: [],
-          status: "draft",
-          publishedAt: "",
-          readingTime: 5,
-        },
-  });
+export function PostForm({ post, categories }: PostFormProps) {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    title: post?.title || "",
+    slug: post?.slug || "",
+    excerpt: post?.excerpt || "",
+    content: post?.content || { type: "doc", content: [] }, // Initialize as JSON
+    mainImage: post?.mainImage || "",
+    status: post?.status || "draft",
+    publishedAt: post?.publishedAt ? new Date(post.publishedAt).toISOString().slice(0, 16) : "",
+    readingTime: post?.readingTime || 5,
+    categories: post?.categories?.map((cat: any) => cat.id) || [],
+  })
 
   // Auto-generate slug from title
   useEffect(() => {
-    if (autoSlug) {
-      const title = form.watch("title");
-      if (title) {
-        form.setValue("slug", slugify(title));
-      }
+    if (formData.title && !post) {
+      setFormData((prev) => ({
+        ...prev,
+        slug: slugify(formData.title),
+      }))
     }
-  }, [form.watch("title"), autoSlug, form]);
+  }, [formData.title, post])
 
-  // Validate content length
-  useEffect(() => {
-    const content = form.watch("content");
-    const errors = [];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
 
-    if (content) {
-      // Check for minimum content length (excluding HTML tags)
-      const textContent = content.replace(/<[^>]*>/g, "");
-      if (textContent.length < 50) {
-        errors.push("Content text should be at least 50 characters.");
-      }
-    }
-
-    // Check for images
-    if (!content.includes("<img") && form.watch("status") === "published") {
-      errors.push("Published posts should include at least one image.");
-    }
-
-    // Check for headings
-    if (
-      !content.includes("<h2") &&
-      !content.includes("<h3") &&
-      content.length > 500
-    ) {
-      errors.push(
-        "Longer posts should include headings (h2 or h3) for better readability."
-      );
-    }
-
-    setValidationErrors(errors);
-  }, [form.watch("content"), form.watch("status"), form]);
-
-  const onSubmit = async (values) => {
-    setIsSubmitting(true);
     try {
-      if (post) {
-        await updatePost(post._id, values);
-      } else {
-        await createPost(values);
+      const data = {
+        ...formData,
+        publishedAt: formData.publishedAt ? new Date(formData.publishedAt).toISOString() : null,
       }
-      router.push("/admin/posts");
-      router.refresh();
+
+      if (post) {
+        await updatePost(post.id, data)
+      } else {
+        await createPost(data)
+      }
+
+      router.push("/admin/posts")
+      router.refresh()
     } catch (error) {
-      console.error("Error saving post:", error);
+      console.error("Error saving post:", error)
+      alert("Error saving post. Please try again.")
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false)
     }
-  };
+  }
+
+  const handleContentChange = (content: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      content,
+    }))
+  }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="media">Media</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-          <TabsContent value="content" className="space-y-4 pt-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Post title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="excerpt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Excerpt</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Brief summary of the post"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    A short summary that appears in blog listings (max 200
-                    characters)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content</FormLabel>
-                  <FormControl>
-                    <Card>
-                      <CardContent className="p-0">
-                        <SimpleEditor
-                          content={field.value ?? ""}
-                          onChange={field.onChange}
-                        />
-                      </CardContent>
-                    </Card>
-                  </FormControl>
-                  <FormMessage />
-                  {validationErrors.length > 0 && (
-                    <Alert variant="destructive" className="mt-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Content validation</AlertTitle>
-                      <AlertDescription>
-                        <ul className="list-disc pl-5 space-y-1">
-                          {validationErrors.map((error, index) => (
-                            <li key={index}>{error}</li>
-                          ))}
-                        </ul>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </FormItem>
-              )}
-            />
-          </TabsContent>
-          <TabsContent value="media" className="space-y-4 pt-4">
-            <FormField
-              control={form.control}
-              name="mainImage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Main Image</FormLabel>
-                  <FormControl>
-                    <ImageUpload
-                      key={field.value || "empty"}
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This image will be displayed at the top of your post and in
-                    listings
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </TabsContent>
-          <TabsContent value="settings" className="space-y-4 pt-4">
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex justify-between items-center">
-                    <FormLabel>Slug</FormLabel>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setAutoSlug(!autoSlug);
-                        if (!autoSlug) {
-                          form.setValue(
-                            "slug",
-                            slugify(form.getValues("title"))
-                          );
-                        }
-                      }}
-                    >
-                      {autoSlug ? "Manual" : "Auto-generate"}
-                    </Button>
-                  </div>
-                  <FormControl>
-                    <Input
-                      placeholder="post-slug"
-                      {...field}
-                      readOnly={autoSlug}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    The URL-friendly version of the title
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="categories"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categories</FormLabel>
-                  <FormControl>
-                    <MultiSelect
-                      options={categories.map((cat) => ({
-                        label: cat.title,
-                        value: cat.id,
-                      }))}
-                      selected={field.value || []}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="published">Published</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="readingTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reading Time (minutes)</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" max="60" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{post ? "Edit Post" : "Create New Post"}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                required
               />
             </div>
-            <FormField
-              control={form.control}
-              name="publishedAt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Publication Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      max={new Date().toISOString().split("T")[0]}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Leave empty for drafts. Cannot be in the future.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </TabsContent>
-        </Tabs>
+            <div>
+              <Label htmlFor="slug">Slug</Label>
+              <Input
+                id="slug"
+                value={formData.slug}
+                onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
 
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/admin/posts")}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={
-              isSubmitting ||
-              (validationErrors.length > 0 &&
-                form.watch("status") === "published")
-            }
-          >
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {post ? "Update Post" : "Create Post"}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
+          <div>
+            <Label htmlFor="excerpt">Excerpt</Label>
+            <Textarea
+              id="excerpt"
+              value={formData.excerpt}
+              onChange={(e) => setFormData((prev) => ({ ...prev, excerpt: e.target.value }))}
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <Label>Main Image</Label>
+            <ImageUpload
+              value={formData.mainImage}
+              onChange={(url) => setFormData((prev) => ({ ...prev, mainImage: url }))}
+            />
+          </div>
+
+          <div>
+            <Label>Content</Label>
+            <TiptapRichTextEditor value={formData.content} onChange={handleContentChange} className="min-h-[400px]" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="publishedAt">Published At</Label>
+              <Input
+                id="publishedAt"
+                type="datetime-local"
+                value={formData.publishedAt}
+                onChange={(e) => setFormData((prev) => ({ ...prev, publishedAt: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="readingTime">Reading Time (minutes)</Label>
+              <Input
+                id="readingTime"
+                type="number"
+                value={formData.readingTime}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, readingTime: Number.parseInt(e.target.value) || 5 }))
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label>Categories</Label>
+            <MultiSelect
+              options={categories.map((cat) => ({ value: cat.id, label: cat.title }))}
+              value={formData.categories}
+              onChange={(categories) => setFormData((prev) => ({ ...prev, categories }))}
+              placeholder="Select categories..."
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Saving..." : post ? "Update Post" : "Create Post"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => router.back()}>
+              Cancel
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </form>
+  )
 }

@@ -9,7 +9,7 @@ export const metadata = {
 export default async function NewPostPage() {
   const allCategories = await prisma.category.findMany();
   return (
-    <div className="flex flex-col gap-4 min-h-full">
+    <div className="flex flex-col gap-4">
       <h1 className="text-3xl font-bold tracking-tight">New Post</h1>
       <PostForm categories={allCategories} />
     </div>

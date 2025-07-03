@@ -1,19 +1,16 @@
 "use client"
-import { useTheme } from "next-themes"
+
+import { JsonContentRenderer } from "./json-content-renderer"
 
 export function PortableText({ value }: { value: any }) {
-  const { theme } = useTheme()
-
-  // If value is a string (from database), render it as HTML
-  if (typeof value === "string") {
-    return <div dangerouslySetInnerHTML={{ __html: value }} />
+  // Handle JSON content (new format)
+  if (typeof value === "object" && value !== null) {
+    return <JsonContentRenderer content={value} className="prose prose-gray dark:prose-invert max-w-none" />
   }
 
-  // If value is an array (from Sanity), use the previous implementation
-  if (Array.isArray(value)) {
-    // This would be the previous Sanity implementation
-    // Since we're removing Sanity, this code path won't be used anymore
-    return <div>Content not available in this format</div>
+  // Handle string content (backward compatibility)
+  if (typeof value === "string") {
+    return <div className="prose prose-gray dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: value }} />
   }
 
   // Default fallback

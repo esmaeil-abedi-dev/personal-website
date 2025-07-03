@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <ThemeProvider defaultTheme="system" storageKey="theme">
-            <div className="relative flex min-h-screen flex-col h-screen overflow-scroll">
+            <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
               <Suspense>
                 <div className="flex-1">{children}</div>

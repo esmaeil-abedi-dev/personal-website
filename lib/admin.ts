@@ -90,6 +90,15 @@ export async function getExperiences() {
   })
 }
 
+/**
+ * Fetch one experience entry by ID.
+ */
+export async function getExperience(id: string) {
+  return prisma.experience.findUnique({
+    where: { id },
+  })
+}
+
 export async function getExperienceById(id) {
   return prisma.experience.findUnique({
     where: { id },

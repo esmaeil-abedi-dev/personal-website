@@ -25,7 +25,7 @@ model Post {
   title       String
   slug        String     @unique
   excerpt     String
-  content     String     @db.Text
+  content     Json       @db.Json // Changed from String to Json
   mainImage   String?
   status      String     @default("draft") // "draft" or "published"
   publishedAt DateTime?
@@ -78,7 +78,7 @@ model SkillCategory {
 model About {
   id        String   @id @default("1") // Only one record
   shortBio  String
-  fullBio   String   @db.Text
+  fullBio   Json     @db.Json // Changed from String to Json
   image     String?
   updatedAt DateTime @updatedAt
 }
@@ -88,7 +88,7 @@ model Project {
   title        String
   slug         String   @unique
   description  String
-  content      String   @db.Text
+  content      Json     @db.Json // Changed from String to Json
   image        String?
   demoUrl      String?
   githubUrl    String?

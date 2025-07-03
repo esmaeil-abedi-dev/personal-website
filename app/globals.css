@@ -1,10 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './styles/_keyframe-animations.css';
-@import './styles/_variables.css';
-
-
 
 @layer base {
   :root {
@@ -76,11 +72,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
   }
 }

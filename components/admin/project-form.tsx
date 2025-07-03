@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createProject, updateProject } from "@/lib/actions";
 import { slugify } from "@/lib/utils";
-import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
+import { SimpleEditor } from "./editor";
 const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
 const formSchema = z.object({
