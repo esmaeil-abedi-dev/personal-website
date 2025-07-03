@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { SimpleEditor } from "@/components/admin/editor";
+import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
 import { ImageUpload } from "@/components/admin/image-upload";
 import { updateAboutPage } from "@/lib/actions";
 
