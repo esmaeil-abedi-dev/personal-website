@@ -28,7 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SimpleEditor } from "@/components/admin/editor";
+import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
 import { MultiSelect } from "@/components/admin/multi-select";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createPost, updatePost } from "@/lib/actions";
