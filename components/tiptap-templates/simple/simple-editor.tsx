@@ -75,7 +75,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -182,7 +182,15 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+
+type SimpleEditorProps = {
+  content?: string | object
+  onChange?: (content: string) => void
+  imageUploadHandler?: (file: File) => Promise<string>
+  onError?: (error: Error) => void
+}
+
+export function SimpleEditor({ content = "", onChange, imageUploadHandler, onError }: SimpleEditorProps) {
   const isMobile = useMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -217,13 +225,18 @@ export function SimpleEditor() {
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
         limit: 3,
-        upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
+        upload: imageUploadHandler || handleImageUpload,
+        onError: onError || ((error) => console.error("Upload failed:", error)),
       }),
       TrailingNode,
       Link.configure({ openOnClick: false }),
     ],
     content: content,
+    onUpdate({ editor }) {
+      if (onChange) {
+        onChange(editor.getHTML())
+      }
+    },
   })
 
   const bodyRect = useCursorVisibility({

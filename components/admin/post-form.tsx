@@ -215,7 +215,7 @@ export function PostForm({ post = null, categories = [] }) {
                     <Card>
                       <CardContent className="p-0">
                         <SimpleEditor
-                          value={field.value ?? ""}
+                          content={field.value ?? ""}
                           onChange={field.onChange}
                         />
                       </CardContent>
