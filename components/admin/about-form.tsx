@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import type { About } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,23 +29,37 @@ const formSchema = z.object({
     .min(1, "Short bio is required")
     .max(300, "Short bio must be less than 300 characters"),
   fullBio: z.any(),
-  image: z.string().optional(),
+  image: z.string().optional().nullable(), // Allow null to match Prisma type
 });
 
-export function AboutForm({ about = null }) {
+type AboutFormData = z.infer<typeof formSchema>;
+
+interface AboutFormProps {
+  about: About | null;
+}
+
+export function AboutForm({ about }: AboutFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm({
+  // Ensure fullBio is in the string format expected by the form/editor,
+  // or an empty string if null/undefined.
+  // The SimpleEditor likely expects a stringified JSON or an empty string.
+  const initialFullBio = about?.fullBio
+    ? typeof about.fullBio === 'string' ? about.fullBio : JSON.stringify(about.fullBio)
+    : JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "" }] }]);
+
+
+  const form = useForm<AboutFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: about || {
-      shortBio: "",
-      fullBio: "",
-      image: "",
+    defaultValues: {
+      shortBio: about?.shortBio || "",
+      fullBio: initialFullBio,
+      image: about?.image || "",
     },
   });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: AboutFormData) => {
     setIsSubmitting(true);
     try {
       await updateAboutPage(values);

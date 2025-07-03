@@ -20,13 +20,13 @@ interface Post {
   title: string;
   mainImage: string | null;
   excerpt: string | null;
-  publishedAt: Date; // Keep as Date
+  publishedAt: string; // Expect ISO string from server
   readingTime: number | null;
   categories: Category[];
 }
 
 interface BlogContentProps {
-  initialPosts: Post[];
+  initialPosts: Post[]; // This will now align with SerializablePost if Category also aligns
   categories: Category[];
 }
 

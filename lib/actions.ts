@@ -21,7 +21,9 @@ function hashPassword(password: string) {
 }
 
 // Blog Posts
-export async function createPost(data) {
+import { Post, Experience, SkillCategory, About, Project } from "@prisma/client";
+
+export async function createPost(data: Omit<Post, "id" | "createdAt" | "updatedAt">): Promise<Post> {
   await checkAuth();
 
   const post = await prisma.post.create({
@@ -48,7 +50,7 @@ export async function createPost(data) {
   return post;
 }
 
-export async function updatePost(id, data) {
+export async function updatePost(id: string, data: Partial<Omit<Post, "id" | "createdAt" | "updatedAt">>): Promise<Post> {
   await checkAuth();
 
   const post = await prisma.post.update({
@@ -77,7 +79,7 @@ export async function updatePost(id, data) {
   return post;
 }
 
-export async function deletePost(id) {
+export async function deletePost(id: string): Promise<Post> {
   await checkAuth();
 
   const post = await prisma.post.delete({
@@ -90,7 +92,7 @@ export async function deletePost(id) {
 }
 
 // Experience
-export async function createExperience(data) {
+export async function createExperience(data: Omit<Experience, "id">): Promise<Experience> {
   await checkAuth();
 
   const experience = await prisma.experience.create({
@@ -109,7 +111,7 @@ export async function createExperience(data) {
   return experience;
 }
 
-export async function updateExperience(id, data) {
+export async function updateExperience(id: string, data: Partial<Omit<Experience, "id">>): Promise<Experience> {
   await checkAuth();
 
   const experience = await prisma.experience.update({
@@ -129,7 +131,7 @@ export async function updateExperience(id, data) {
   return experience;
 }
 
-export async function deleteExperience(id) {
+export async function deleteExperience(id: string): Promise<Experience> {
   await checkAuth();
 
   const experience = await prisma.experience.delete({
@@ -142,7 +144,7 @@ export async function deleteExperience(id) {
 }
 
 // Skills
-export async function createSkillCategory(data) {
+export async function createSkillCategory(data: Omit<SkillCategory, "id">): Promise<SkillCategory> {
   await checkAuth();
 
   const skillCategory = await prisma.skillCategory.create({
@@ -158,7 +160,7 @@ export async function createSkillCategory(data) {
   return skillCategory;
 }
 
-export async function updateSkillCategory(id, data) {
+export async function updateSkillCategory(id: string, data: Partial<Omit<SkillCategory, "id">>): Promise<SkillCategory> {
   await checkAuth();
 
   const skillCategory = await prisma.skillCategory.update({
@@ -175,7 +177,7 @@ export async function updateSkillCategory(id, data) {
   return skillCategory;
 }
 
-export async function deleteSkillCategory(id) {
+export async function deleteSkillCategory(id: string): Promise<SkillCategory> {
   await checkAuth();
 
   const skillCategory = await prisma.skillCategory.delete({
@@ -188,7 +190,7 @@ export async function deleteSkillCategory(id) {
 }
 
 // About Page
-export async function updateAboutPage(data) {
+export async function updateAboutPage(data: Omit<About, "id" | "updatedAt">): Promise<About> {
   await checkAuth();
 
   const about = await prisma.about.upsert({
@@ -214,7 +216,7 @@ export async function updateAboutPage(data) {
 // Image Upload
 import { put } from "@vercel/blob";
 
-export async function uploadImage(file) {
+export async function uploadImage(file: File): Promise<string> {
   await checkAuth();
 
   if (!file) {
@@ -229,7 +231,7 @@ export async function uploadImage(file) {
 }
 
 // Projects
-export async function createProject(data) {
+export async function createProject(data: Omit<Project, "id" | "createdAt" | "updatedAt">): Promise<Project> {
   await checkAuth();
 
   const project = await prisma.project.create({
@@ -252,7 +254,7 @@ export async function createProject(data) {
   return project;
 }
 
-export async function updateProject(id, data) {
+export async function updateProject(id: string, data: Partial<Omit<Project, "id" | "createdAt" | "updatedAt">>): Promise<Project> {
   await checkAuth();
 
   const project = await prisma.project.update({
@@ -277,7 +279,7 @@ export async function updateProject(id, data) {
   return project;
 }
 
-export async function deleteProject(id) {
+export async function deleteProject(id: string): Promise<Project> {
   await checkAuth();
 
   const project = await prisma.project.delete({
@@ -289,7 +291,7 @@ export async function deleteProject(id) {
   return project;
 }
 
-export async function toggleProjectFeatured(id) {
+export async function toggleProjectFeatured(id: string): Promise<Project> {
   await checkAuth();
 
   const project = await prisma.project.findUnique({
@@ -314,7 +316,11 @@ export async function toggleProjectFeatured(id) {
 }
 
 // Newsletter
-export async function subscribeToNewsletter(email: string, name: string = "") {
+interface NewsletterResponse {
+  success: boolean;
+  message: string;
+}
+export async function subscribeToNewsletter(email: string, name: string = ""): Promise<NewsletterResponse> {
   try {
     // Check if the email already exists
     const existingSubscriber = await prisma.newsletterSubscriber.findUnique({
@@ -348,7 +354,7 @@ export async function subscribeToNewsletter(email: string, name: string = "") {
   }
 }
 
-export async function unsubscribeFromNewsletter(email: string) {
+export async function unsubscribeFromNewsletter(email: string): Promise<NewsletterResponse> {
   try {
     const subscriber = await prisma.newsletterSubscriber.findUnique({
       where: { email },

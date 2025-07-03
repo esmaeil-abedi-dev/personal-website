@@ -17,24 +17,32 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { deletePost } from "@/lib/actions"
+} from "@/components/ui/alert-dialog";
+import { deletePost } from "@/lib/actions";
+import type { Post, Category } from "@prisma/client";
 
-export function PostsTable({ posts }) {
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [postToDelete, setPostToDelete] = useState(null)
+// Define the type for a post that includes its categories
+type PostWithCategories = Post & { categories: Category[] };
+
+interface PostsTableProps {
+  posts: PostWithCategories[];
+}
+
+export function PostsTable({ posts }: PostsTableProps) {
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<PostWithCategories | null>(null);
 
   const handleDelete = async () => {
     if (postToDelete) {
-      await deletePost(postToDelete._id)
-      router.refresh()
-      setIsDeleteDialogOpen(false)
-      setPostToDelete(null)
+      await deletePost(postToDelete.id); // Use id instead of _id
+      router.refresh();
+      setIsDeleteDialogOpen(false);
+      setPostToDelete(null);
     }
-  }
+  };
 
-  const confirmDelete = (post) => {
+  const confirmDelete = (post: PostWithCategories) => {
     setPostToDelete(post)
     setIsDeleteDialogOpen(true)
   }
@@ -53,8 +61,8 @@ export function PostsTable({ posts }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post._id}>
+            {posts.map((post: PostWithCategories) => (
+              <TableRow key={post.id}>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>
                   <Badge variant={post.status === "published" ? "default" : "secondary"}>
@@ -66,8 +74,8 @@ export function PostsTable({ posts }) {
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {post.categories?.map((category) => (
-                      <Badge key={category._id} variant="outline">
+                    {post.categories?.map((category: Category) => (
+                      <Badge key={category.id} variant="outline">
                         {category.title}
                       </Badge>
                     ))}
@@ -81,7 +89,7 @@ export function PostsTable({ posts }) {
                         <span className="sr-only">View</span>
                       </Button>
                     </Link>
-                    <Link href={`/admin/posts/${post._id}`}>
+                    <Link href={`/admin/posts/${post.id}`}>
                       <Button variant="ghost" size="icon">
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>

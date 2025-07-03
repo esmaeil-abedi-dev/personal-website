@@ -1,9 +1,32 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { type NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+// Define a union type for the search results
+type SearchResultItem =
+  | {
+      id: string;
+      title: string;
+      excerpt: string | null;
+      slug: string;
+      type: "post";
+      image: string | null;
+      date: Date | null;
+      categories: string[];
+    }
+  | {
+      id: string;
+      title: string;
+      excerpt: string | null;
+      slug: string;
+      type: "project";
+      image: string | null;
+      date: Date;
+      technologies: string[];
+    };
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const query = searchParams.get("q")
+  const searchParams = request.nextUrl.searchParams;
+  const query = searchParams.get("q");
   const type = searchParams.get("type")
 
   if (!query) {
@@ -11,7 +34,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    let results = []
+    let results: SearchResultItem[] = [];
 
     // Search blog posts
     if (!type || type === "post") {

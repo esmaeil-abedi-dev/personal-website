@@ -5,23 +5,37 @@ import { X, Check } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-export function MultiSelect({ options, selected, onChange }) {
-  const [open, setOpen] = useState(false)
+export interface MultiSelectOption {
+  label: string;
+  value: string;
+}
 
-  const handleSelect = (value) => {
-    const newSelected = selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value]
+interface MultiSelectProps {
+  options: MultiSelectOption[];
+  selected: string[];
+  onChange: (selectedValues: string[]) => void;
+}
 
-    onChange(newSelected)
-  }
+export function MultiSelect({ options, selected, onChange }: MultiSelectProps) {
+  const [open, setOpen] = useState(false);
 
-  const handleRemove = (value) => {
-    onChange(selected.filter((item) => item !== value))
-  }
+  const handleSelect = (value: string) => {
+    const newSelected = selected.includes(value)
+      ? selected.filter((item) => item !== value)
+      : [...selected, value];
+    onChange(newSelected);
+  };
 
-  const selectedItems = options.filter((option) => selected.includes(option.value))
+  const handleRemove = (value: string) => {
+    onChange(selected.filter((item) => item !== value));
+  };
+
+  const selectedItems = options.filter((option) =>
+    selected.includes(option.value)
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -29,7 +43,7 @@ export function MultiSelect({ options, selected, onChange }) {
         <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
           <div className="flex flex-wrap gap-1">
             {selectedItems.length > 0 ? (
-              selectedItems.map((item) => (
+              selectedItems.map((item: MultiSelectOption) => (
                 <Badge key={item.value} variant="secondary" className="mr-1">
                   {item.label}
                   <button
@@ -57,7 +71,7 @@ export function MultiSelect({ options, selected, onChange }) {
           <CommandList>
             <CommandEmpty>No item found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {options.map((option: MultiSelectOption) => (
                 <CommandItem key={option.value} onSelect={() => handleSelect(option.value)}>
                   <Check
                     className={cn("mr-2 h-4 w-4", selected.includes(option.value) ? "opacity-100" : "opacity-0")}

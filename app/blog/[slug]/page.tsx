@@ -36,11 +36,11 @@ export async function generateMetadata({
 
     return constructMetadata({
       title: `${post.title} - Esmaeil Abedi's Blog`,
-      description: post.excerpt,
+      description: post.excerpt ?? undefined, // Ensure string | undefined
       url: `/blog/${post.slug}`,
-      ogImage: post.mainImage,
+      ogImage: post.mainImage ?? undefined, // Ensure string | undefined
       type: "article",
-      publishedTime: post.publishedAt.toISOString(),
+      publishedTime: post.publishedAt ? post.publishedAt.toISOString() : undefined,
       tags: post.categories?.map((cat) => cat.title) || [],
     });
   } catch (error) {
@@ -83,11 +83,11 @@ export default async function BlogPostPage({
       "@context": "https://schema.org",
       "@type": "BlogPosting",
       headline: post.title,
-      description: post.excerpt,
-      image: post.mainImage,
-      datePublished: post.publishedAt.toISOString(),
+      description: post.excerpt ?? undefined,
+      image: post.mainImage ?? undefined,
+      datePublished: post.publishedAt ? post.publishedAt.toISOString() : undefined,
       dateModified:
-        post.updatedAt?.toISOString() || post.publishedAt.toISOString(),
+        post.updatedAt?.toISOString() || (post.publishedAt ? post.publishedAt.toISOString() : undefined),
       author: {
         "@type": "Person",
         name: "Esmaeil Abedi",
@@ -135,13 +135,15 @@ export default async function BlogPostPage({
                 {post.title}
               </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <time dateTime={post.publishedAt.toISOString()}>
-                  {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </time>
+                {post.publishedAt && (
+                  <time dateTime={post.publishedAt.toISOString()}>
+                    {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </time>
+                )}
                 <div className="text-sm text-muted-foreground">
                   {post.readingTime} min read
                 </div>

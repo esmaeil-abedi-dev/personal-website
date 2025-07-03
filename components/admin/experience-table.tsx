@@ -16,24 +16,29 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { deleteExperience } from "@/lib/actions"
+} from "@/components/ui/alert-dialog";
+import { deleteExperience } from "@/lib/actions";
+import type { Experience } from "@prisma/client";
 
-export function ExperienceTable({ experiences }) {
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [experienceToDelete, setExperienceToDelete] = useState(null)
+interface ExperienceTableProps {
+  experiences: Experience[];
+}
+
+export function ExperienceTable({ experiences }: ExperienceTableProps) {
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
 
   const handleDelete = async () => {
     if (experienceToDelete) {
-      await deleteExperience(experienceToDelete._id)
-      router.refresh()
-      setIsDeleteDialogOpen(false)
-      setExperienceToDelete(null)
+      await deleteExperience(experienceToDelete.id); // Use id instead of _id
+      router.refresh();
+      setIsDeleteDialogOpen(false);
+      setExperienceToDelete(null);
     }
-  }
+  };
 
-  const confirmDelete = (experience) => {
+  const confirmDelete = (experience: Experience) => {
     setExperienceToDelete(experience)
     setIsDeleteDialogOpen(true)
   }
@@ -52,16 +57,17 @@ export function ExperienceTable({ experiences }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {experiences.map((exp) => (
-              <TableRow key={exp._id}>
+            {experiences.map((exp: Experience) => (
+              <TableRow key={exp.id}>
                 <TableCell className="font-medium">{exp.position}</TableCell>
                 <TableCell>{exp.company}</TableCell>
                 <TableCell>
-                  {exp.startDate} - {exp.endDate || "Present"}
+                  {/* Assuming startDate and endDate are strings or Date objects that can be rendered */}
+                  {exp.startDate instanceof Date ? exp.startDate.toLocaleDateString() : exp.startDate} - {exp.endDate instanceof Date ? exp.endDate.toLocaleDateString() : (exp.endDate || "Present")}
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {exp.technologies?.map((tech, i) => (
+                    {exp.technologies?.map((tech: string, i: number) => (
                       <Badge key={i} variant="outline">
                         {tech}
                       </Badge>
@@ -70,7 +76,7 @@ export function ExperienceTable({ experiences }) {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/admin/experience/${exp._id}`}>
+                    <Link href={`/admin/experience/${exp.id}`}>
                       <Button variant="ghost" size="icon">
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>

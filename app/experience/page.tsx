@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Suspense } from "react";
+import type { Experience, Education, SkillCategory } from "@prisma/client";
 
 export const metadata = {
   title: "Experience - Esmaeil Abedi",
@@ -10,9 +11,9 @@ export const metadata = {
 };
 
 export default async function ExperiencePage() {
-  let experiences = [];
-  let education = [];
-  let skills = [];
+  let experiences: Experience[] = [];
+  let education: Education[] = [];
+  let skills: SkillCategory[] = [];
 
   try {
     experiences = await prisma.experience.findMany({
@@ -34,6 +35,7 @@ export default async function ExperiencePage() {
     });
   } catch (error) {
     console.error("Error fetching experience data:", error);
+    // Variables will remain empty arrays
   }
 
   return (
@@ -64,7 +66,7 @@ export default async function ExperiencePage() {
                       <p className="mb-4">{exp.description}</p>
                       {exp.technologies && exp.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {exp.technologies.map((tech, index) => (
+                          {exp.technologies.map((tech: string, index: number) => (
                             <Badge key={index} variant="secondary">
                               {tech}
                             </Badge>
@@ -127,7 +129,7 @@ export default async function ExperiencePage() {
                         {skillCategory.category}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {skillCategory.skills.map((skill, index) => (
+                         {skillCategory.skills.map((skill: string, index: number) => (
                           <Badge key={index} variant="outline">
                             {skill}
                           </Badge>

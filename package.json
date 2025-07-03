@@ -14,7 +14,7 @@
     "@emotion/is-prop-valid": "latest",
     "@floating-ui/react": "^0.27.12",
     "@hookform/resolvers": "latest",
-    "@prisma/client": "latest",
+    "@prisma/client": "^6.11.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -93,6 +93,6 @@
     "postcss": "^8.5",
     "sass": "^1.89.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }

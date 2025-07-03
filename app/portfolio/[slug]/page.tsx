@@ -29,7 +29,7 @@ export async function generateMetadata({
       title: `${project.title} - Esmaeil Abedi's Portfolio`,
       description: project.description,
       url: `/portfolio/${project.slug}`,
-      ogImage: project.image,
+      ogImage: project.image ?? undefined, // Ensure string | undefined
       type: "article",
       tags: project.technologies,
     });
@@ -65,7 +65,7 @@ export default async function ProjectPage({
       "@type": "CreativeWork",
       name: project.title,
       description: project.description,
-      image: project.image,
+      image: project.image ?? undefined,
       dateCreated: project.createdAt.toISOString(),
       dateModified:
         project.updatedAt?.toISOString() || project.createdAt.toISOString(),

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Suspense } from "react";
+import type { Project } from "@prisma/client";
 
 export const metadata = {
   title: "Portfolio - Esmaeil Abedi",
@@ -14,7 +15,7 @@ export const metadata = {
 };
 
 export default async function PortfolioPage() {
-  let projects = [];
+  let projects: Project[] = [];
 
   try {
     projects = await prisma.project.findMany({
@@ -22,6 +23,7 @@ export default async function PortfolioPage() {
     });
   } catch (error) {
     console.error("Error fetching projects:", error);
+    // projects will remain an empty array
   }
 
   return (
@@ -67,7 +69,7 @@ export default async function PortfolioPage() {
                         {project.description}
                       </p>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {project.technologies.map((tech, index) => (
+                        {project.technologies.map((tech: string, index: number) => (
                           <Badge key={index} variant="secondary">
                             {tech}
                           </Badge>
@@ -148,7 +150,7 @@ export default async function PortfolioPage() {
                         {project.description}
                       </p>
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {project.technologies.slice(0, 3).map((tech, index) => (
+                        {project.technologies.slice(0, 3).map((tech: string, index: number) => (
                           <Badge key={index} variant="outline">
                             {tech}
                           </Badge>

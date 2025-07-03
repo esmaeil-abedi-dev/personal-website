@@ -43,7 +43,8 @@ function LoginFormContent({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const router = useRouter();
-  const callbackUrl = searchParams?.callbackUrl || "/admin";
+  const rawCallbackUrl = searchParams?.callbackUrl;
+  const callbackUrl = Array.isArray(rawCallbackUrl) ? rawCallbackUrl[0] : rawCallbackUrl || "/admin";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 

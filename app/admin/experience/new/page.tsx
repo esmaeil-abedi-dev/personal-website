@@ -1,5 +1,5 @@
 import { ExperienceForm } from "@/components/admin/experience-form"; // This component will be created in the next step
-import { getExperience } from "@/lib/admin"; // Assuming a function to get a single experience if we were editing
+import { getExperienceById } from "@/lib/admin"; // Assuming a function to get a single experience if we were editing
 
 export const metadata = {
   title: "Add New Experience - Admin Panel",

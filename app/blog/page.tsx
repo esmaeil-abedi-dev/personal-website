@@ -2,6 +2,20 @@
 import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
 import BlogContent from "./blog-content"; // Import the new component
+import type { Post, Category } from "@prisma/client";
+
+// Define a more specific type for categories within SerializablePost
+type SerializableCategory = Pick<Category, "id" | "slug" | "title">;
+
+// Define the type for posts after processing for client-side consumption
+// This should match what BlogContent expects for initialPosts
+type SerializablePost = Omit<Post, "publishedAt" | "categories" | "createdAt" | "updatedAt"> & {
+  publishedAt: string; // Or Date, depending on how it's used in BlogContent
+  categories: SerializableCategory[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 
 export const metadata = {
   title: "Blog - Esmaeil Abedi",
@@ -10,28 +24,36 @@ export const metadata = {
 };
 
 // Helper function to ensure serializable Post data
-const processPosts = (posts: any[]) => {
-  return posts.map((post) => ({
-    ...post,
-    publishedAt: post.publishedAt ? new Date(post.publishedAt) : new Date(), // Ensure Date object
-    // Ensure categories is an array, and each category has id, slug, title
-    categories: post.categories
-      ? post.categories.map((cat: any) => ({
-          id: cat.id || String(Math.random()), // Fallback for id
-          slug: cat.slug || "", // Fallback for slug
-          title: cat.title || "Untitled Category", // Fallback for title
-        }))
-      : [],
-    // Ensure other potentially problematic fields are handled if necessary
-    readingTime: post.readingTime || 0,
-    mainImage: post.mainImage || null,
-    excerpt: post.excerpt || "",
-  }));
+const processPosts = (posts: (Post & { categories: Category[] })[]): SerializablePost[] => {
+  return posts.map((post) => {
+    const { createdAt, updatedAt, publishedAt, categories, ...restOfPost } = post;
+    return {
+      ...restOfPost,
+      // Ensure dates are stringified for serialization
+      publishedAt: publishedAt ? publishedAt.toISOString() : new Date().toISOString(),
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString(),
+      // Ensure categories is an array, and each category has id, slug, title
+      categories: categories
+        ? categories.map((cat) => ({
+            id: cat.id,
+            slug: cat.slug,
+            title: cat.title,
+            // No need for description here based on SerializableCategory
+          }))
+        : [],
+      // Ensure other potentially problematic fields are handled if necessary
+      // These should ideally match the SerializablePost structure if different from Post
+      readingTime: post.readingTime ?? 0, // Use nullish coalescing
+      mainImage: post.mainImage ?? null,
+      excerpt: post.excerpt ?? "",
+    };
+  });
 };
 
 export default async function BlogPage() {
   // Fetch all categories
-  let categories = [];
+  let categories: Category[] = [];
   try {
     categories = await prisma.category.findMany({
       orderBy: {
@@ -40,11 +62,11 @@ export default async function BlogPage() {
     });
   } catch (error) {
     console.error("Error fetching categories:", error);
-    // Optionally, return an error state or fallback UI for categories
+    // categories will remain an empty array
   }
 
   // Fetch all posts
-  let posts = [];
+  let posts: (Post & { categories: Category[] })[] = [];
   try {
     posts = await prisma.post.findMany({
       where: {

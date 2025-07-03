@@ -6,12 +6,18 @@ import { Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { uploadImage } from "@/lib/actions"
+import React from "react"
 
-export function ImageUpload({ value, onChange }) {
+interface ImageUploadProps {
+  value: string | null | undefined;
+  onChange: (url: string | null) => void;
+}
+
+export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 

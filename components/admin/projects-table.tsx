@@ -16,29 +16,34 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { deleteProject, toggleProjectFeatured } from "@/lib/actions"
+} from "@/components/ui/alert-dialog";
+import { deleteProject, toggleProjectFeatured } from "@/lib/actions";
+import type { Project } from "@prisma/client";
 
-export function ProjectsTable({ projects }) {
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [projectToDelete, setProjectToDelete] = useState(null)
+interface ProjectsTableProps {
+  projects: Project[];
+}
+
+export function ProjectsTable({ projects }: ProjectsTableProps) {
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const handleDelete = async () => {
     if (projectToDelete) {
-      await deleteProject(projectToDelete.id)
-      router.refresh()
-      setIsDeleteDialogOpen(false)
-      setProjectToDelete(null)
+      await deleteProject(projectToDelete.id);
+      router.refresh();
+      setIsDeleteDialogOpen(false);
+      setProjectToDelete(null);
     }
-  }
+  };
 
-  const confirmDelete = (project) => {
-    setProjectToDelete(project)
-    setIsDeleteDialogOpen(true)
-  }
+  const confirmDelete = (project: Project) => {
+    setProjectToDelete(project);
+    setIsDeleteDialogOpen(true);
+  };
 
-  const handleToggleFeatured = async (project) => {
+  const handleToggleFeatured = async (project: Project) => {
     await toggleProjectFeatured(project.id)
     router.refresh()
   }
@@ -57,7 +62,7 @@ export function ProjectsTable({ projects }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {projects.map((project) => (
+            {projects.map((project: Project) => (
               <TableRow key={project.id}>
                 <TableCell className="font-medium">{project.title}</TableCell>
                 <TableCell>
@@ -78,7 +83,7 @@ export function ProjectsTable({ projects }) {
                 <TableCell>{project.order}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {project.technologies?.map((tech, i) => (
+                    {project.technologies?.map((tech: string, i: number) => (
                       <Badge key={i} variant="outline">
                         {tech}
                       </Badge>

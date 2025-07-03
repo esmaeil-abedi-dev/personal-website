@@ -75,7 +75,12 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+// import content from "@/components/tiptap-templates/simple/data/content.json"; // We will use props now
+
+interface SimpleEditorProps {
+  value: string; // JSON string of Tiptap content, or empty string
+  onChange: (value: string) => void; // Callback with new content as JSON string
+}
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -182,7 +187,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export function SimpleEditor({ value, onChange }: SimpleEditorProps) {
   const isMobile = useMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -191,7 +196,7 @@ export function SimpleEditor() {
   const toolbarRef = React.useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
-    immediatelyRender: false,
+    immediatelyRender: false, // Set to true if initial render depends on content right away
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -223,8 +228,32 @@ export function SimpleEditor() {
       TrailingNode,
       Link.configure({ openOnClick: false }),
     ],
-    content: content,
-  })
+    content: "", // Will be set by useEffect or directly if editor instance allows
+    onUpdate: ({ editor }) => {
+      onChange(JSON.stringify(editor.getJSON()));
+    },
+  });
+
+  React.useEffect(() => {
+    if (editor && value && editor.isEditable) {
+      // Only set content if it's different to avoid loop
+      // This basic check might need refinement for deep comparison
+      try {
+        const currentContentJson = JSON.stringify(editor.getJSON());
+        if (currentContentJson !== value) {
+          const parsedContent = JSON.parse(value);
+          editor.commands.setContent(parsedContent, false); // `false` to not emit update event
+        }
+      } catch (e) {
+        // If value is not valid JSON, set to empty or default
+        console.error("Invalid JSON content for editor:", e);
+        editor.commands.setContent(JSON.parse(JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "" }] }])), false);
+      }
+    } else if (editor && !value && editor.isEditable) {
+       editor.commands.setContent(JSON.parse(JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "" }] }])), false);
+    }
+  }, [editor, value]);
+
 
   const bodyRect = useCursorVisibility({
     editor,

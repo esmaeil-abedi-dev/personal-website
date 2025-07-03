@@ -5,10 +5,14 @@ import { Button } from "@/components/ui/button";
 import { HeroAnimation } from "@/components/hero-animation";
 import { NewsletterSection } from "@/components/newsletter-section";
 import { prisma } from "@/lib/prisma";
+import type { Post, Category } from "@prisma/client";
+
+// Define the type for posts fetched with categories
+type PostWithCategories = Post & { categories: Category[] };
 
 export default async function Home() {
   // Fetch latest posts from the database
-  let latestPosts = [];
+  let latestPosts: PostWithCategories[] = [];
   try {
     latestPosts = await prisma.post.findMany({
       where: {
@@ -137,9 +141,11 @@ export default async function Home() {
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {post.excerpt}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(post.publishedAt).toLocaleDateString()}
-                      </p>
+                      {post.publishedAt && (
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(post.publishedAt).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </Link>

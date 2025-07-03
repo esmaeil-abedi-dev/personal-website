@@ -16,33 +16,38 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { unsubscribeFromNewsletter, subscribeToNewsletter } from "@/lib/actions"
+} from "@/components/ui/alert-dialog";
+import { unsubscribeFromNewsletter, subscribeToNewsletter } from "@/lib/actions";
+import type { NewsletterSubscriber } from "@prisma/client";
 
-export function NewsletterSubscribersTable({ subscribers }) {
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [subscriberToDelete, setSubscriberToDelete] = useState(null)
+interface NewsletterSubscribersTableProps {
+  subscribers: NewsletterSubscriber[];
+}
 
-  const handleUnsubscribe = async (subscriber) => {
+export function NewsletterSubscribersTable({ subscribers }: NewsletterSubscribersTableProps) {
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [subscriberToDelete, setSubscriberToDelete] = useState<NewsletterSubscriber | null>(null);
+
+  const handleUnsubscribe = async (subscriber: NewsletterSubscriber) => {
     try {
-      await unsubscribeFromNewsletter(subscriber.email)
-      router.refresh()
+      await unsubscribeFromNewsletter(subscriber.email);
+      router.refresh();
     } catch (error) {
-      console.error("Error unsubscribing:", error)
+      console.error("Error unsubscribing:", error);
     }
-  }
+  };
 
-  const handleResubscribe = async (subscriber) => {
+  const handleResubscribe = async (subscriber: NewsletterSubscriber) => {
     try {
-      await subscribeToNewsletter(subscriber.email, subscriber.name)
-      router.refresh()
+      await subscribeToNewsletter(subscriber.email, subscriber.name ?? undefined); // Ensure name is string | undefined
+      router.refresh();
     } catch (error) {
-      console.error("Error resubscribing:", error)
+      console.error("Error resubscribing:", error);
     }
-  }
+  };
 
-  const confirmDelete = (subscriber) => {
+  const confirmDelete = (subscriber: NewsletterSubscriber) => {
     setSubscriberToDelete(subscriber)
     setIsDeleteDialogOpen(true)
   }
@@ -61,7 +66,7 @@ export function NewsletterSubscribersTable({ subscribers }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {subscribers.map((subscriber) => (
+            {subscribers.map((subscriber: NewsletterSubscriber) => (
               <TableRow key={subscriber.id}>
                 <TableCell className="font-medium">{subscriber.name}</TableCell>
                 <TableCell>{subscriber.email}</TableCell>
@@ -116,15 +121,18 @@ export function NewsletterSubscribersTable({ subscribers }) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                try {
-                  // In a real implementation, you would have a deleteSubscriber action
-                  // For now, we'll just unsubscribe them
-                  await unsubscribeFromNewsletter(subscriberToDelete.email)
-                  router.refresh()
-                  setIsDeleteDialogOpen(false)
-                  setSubscriberToDelete(null)
-                } catch (error) {
-                  console.error("Error deleting subscriber:", error)
+                if (subscriberToDelete) {
+                  try {
+                    // In a real implementation, you would have a deleteSubscriber action
+                    // For now, we'll just unsubscribe them (which marks as inactive)
+                    await unsubscribeFromNewsletter(subscriberToDelete.email);
+                    router.refresh();
+                  } catch (error) {
+                    console.error("Error deleting subscriber:", error);
+                  } finally {
+                    setIsDeleteDialogOpen(false);
+                    setSubscriberToDelete(null);
+                  }
                 }
               }}
               className="bg-destructive text-destructive-foreground"

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, AlertTriangle } from "lucide-react";
+import type { Project } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -71,7 +72,13 @@ const formSchema = z.object({
   order: z.coerce.number().int().default(0),
 });
 
-export function ProjectForm({ project = null }) {
+type ProjectFormData = z.infer<typeof formSchema>;
+
+interface ProjectFormProps {
+  project?: Project | null; // Make project optional for new project creation
+}
+
+export function ProjectForm({ project = null }: ProjectFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
@@ -79,27 +86,25 @@ export function ProjectForm({ project = null }) {
     project?.technologies || []
   );
   const [newTech, setNewTech] = useState("");
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [autoSlug, setAutoSlug] = useState(!project?.slug);
 
-  const form = useForm({
+  const defaultProjectValues: ProjectFormData = {
+    title: project?.title || "",
+    slug: project?.slug || "",
+    description: project?.description || "",
+    content: project?.content || JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "" }] }]), // Default empty Tiptap content
+    image: project?.image || "",
+    demoUrl: project?.demoUrl || "",
+    githubUrl: project?.githubUrl || "",
+    technologies: project?.technologies || [],
+    featured: project?.featured || false,
+    order: project?.order || 0,
+  };
+
+  const form = useForm<ProjectFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: project
-      ? {
-          ...project,
-        }
-      : {
-          title: "",
-          slug: "",
-          description: "",
-          content: "",
-          image: "",
-          demoUrl: "",
-          githubUrl: "",
-          technologies: [],
-          featured: false,
-          order: 0,
-        },
+    defaultValues: defaultProjectValues,
   });
 
   // Auto-generate slug from title
@@ -155,13 +160,18 @@ export function ProjectForm({ project = null }) {
     form.setValue("technologies", updatedTechnologies);
   };
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: ProjectFormData) => {
     setIsSubmitting(true);
     try {
+      // Ensure technologies are part of the values submitted if managed separately
+      const submissionValues = {
+        ...values,
+        technologies: technologies, // Use the state 'technologies' as the source of truth
+      };
       if (project) {
-        await updateProject(project.id, values);
+        await updateProject(project.id, submissionValues);
       } else {
-        await createProject(values);
+        await createProject(submissionValues);
       }
       router.push("/admin/projects");
       router.refresh();

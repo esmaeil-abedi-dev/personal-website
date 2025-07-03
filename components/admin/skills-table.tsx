@@ -15,24 +15,29 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { deleteSkillCategory } from "@/lib/actions"
+} from "@/components/ui/alert-dialog";
+import { deleteSkillCategory } from "@/lib/actions";
+import type { SkillCategory } from "@prisma/client";
 
-export function SkillsTable({ skills }) {
-  const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [skillToDelete, setSkillToDelete] = useState(null)
+interface SkillsTableProps {
+  skills: SkillCategory[];
+}
+
+export function SkillsTable({ skills }: SkillsTableProps) {
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState<SkillCategory | null>(null);
 
   const handleDelete = async () => {
     if (skillToDelete) {
-      await deleteSkillCategory(skillToDelete._id)
-      router.refresh()
-      setIsDeleteDialogOpen(false)
-      setSkillToDelete(null)
+      await deleteSkillCategory(skillToDelete.id); // Use id instead of _id
+      router.refresh();
+      setIsDeleteDialogOpen(false);
+      setSkillToDelete(null);
     }
-  }
+  };
 
-  const confirmDelete = (skill) => {
+  const confirmDelete = (skill: SkillCategory) => {
     setSkillToDelete(skill)
     setIsDeleteDialogOpen(true)
   }
@@ -49,13 +54,13 @@ export function SkillsTable({ skills }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {skills.map((skill) => (
-              <TableRow key={skill._id}>
+            {skills.map((skill: SkillCategory) => (
+              <TableRow key={skill.id}>
                 <TableCell className="font-medium">{skill.category}</TableCell>
                 <TableCell>{skill.order}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/admin/skills/${skill._id}`}>
+                    <Link href={`/admin/skills/${skill.id}`}>
                       <Button variant="ghost" size="icon">
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>

@@ -1,8 +1,18 @@
 "use client"
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
-export function Overview({ data }) {
+interface OverviewChartDataItem {
+  name: string;
+  posts: number;
+  visitors: number;
+}
+
+interface OverviewProps {
+  data: OverviewChartDataItem[];
+}
+
+export function Overview({ data }: OverviewProps) {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
@@ -13,5 +23,5 @@ export function Overview({ data }) {
         <Bar dataKey="visitors" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
-  )
+  );
 }

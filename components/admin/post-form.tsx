@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, AlertTriangle } from "lucide-react";
+import type { Post, Category } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -71,35 +72,37 @@ const formSchema = z.object({
     .max(60, "Reading time must be less than 60 minutes."),
 });
 
-export function PostForm({ post = null, categories = [] }) {
+type PostFormData = z.infer<typeof formSchema>;
+
+interface PostFormProps {
+  post?: (Post & { categories: Category[] }) | null; // Make post optional for new post creation
+  categories: Category[];
+}
+
+export function PostForm({ post = null, categories = [] }: PostFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [autoSlug, setAutoSlug] = useState(!post?.slug);
 
-  const form = useForm({
+  const defaultPostValues: PostFormData = {
+    title: post?.title || "",
+    slug: post?.slug || "",
+    excerpt: post?.excerpt || "",
+    content: post?.content || JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "" }] }]), // Default empty Tiptap content
+    mainImage: post?.mainImage || "",
+    categories: post?.categories?.map((cat) => cat.id) || [],
+    status: post?.status || "draft",
+    publishedAt: post?.publishedAt
+      ? new Date(post.publishedAt).toISOString().split("T")[0]
+      : "",
+    readingTime: post?.readingTime || 5,
+  };
+
+  const form = useForm<PostFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: post
-      ? {
-          ...post,
-          categories: post.categories?.map((cat) => cat.id) || [],
-          publishedAt: post.publishedAt
-            ? new Date(post.publishedAt).toISOString().split("T")[0]
-            : "",
-          content: post.content || "",
-        }
-      : {
-          title: "",
-          slug: "",
-          excerpt: "",
-          content: "",
-          mainImage: "",
-          categories: [],
-          status: "draft",
-          publishedAt: "",
-          readingTime: 5,
-        },
+    defaultValues: defaultPostValues,
   });
 
   // Auto-generate slug from title
@@ -144,13 +147,20 @@ export function PostForm({ post = null, categories = [] }) {
     setValidationErrors(errors);
   }, [form.watch("content"), form.watch("status"), form]);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: PostFormData) => {
     setIsSubmitting(true);
     try {
+      const submissionValues = {
+        ...values,
+        // values.categories is already string[] due to formSchema and MultiSelect
+        categories: values.categories,
+        publishedAt: values.status === 'published' && values.publishedAt ? new Date(values.publishedAt).toISOString() : null,
+      };
+
       if (post) {
-        await updatePost(post._id, values);
+        await updatePost(post.id, submissionValues);
       } else {
-        await createPost(values);
+        await createPost(submissionValues);
       }
       router.push("/admin/posts");
       router.refresh();

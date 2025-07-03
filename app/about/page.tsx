@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { PortableText } from "@/components/portable-text";
+import type { About } from "@prisma/client";
 
 export const metadata = {
   title: "About - Esmaeil Abedi",
@@ -8,11 +9,13 @@ export const metadata = {
 };
 
 export default async function AboutPage() {
-  let about = {
+  let about: About = {
+    id: "1", // Default ID
+    updatedAt: new Date(), // Default date
     image: null,
     shortBio:
       "Software developer passionate about creating beautiful and functional web applications.",
-    fullBio: [],
+    fullBio: JSON.stringify([{ _type: "block", children: [{ _type: "span", text: "Default full bio if not found." }] }]), // Default empty Portable Text structure
   };
 
   try {
@@ -26,6 +29,9 @@ export default async function AboutPage() {
   } catch (error) {
     console.error("Error fetching about page data:", error);
   }
+
+  // Ensure fullBio is parsed if it's a string
+  const parsedFullBio = typeof about.fullBio === 'string' ? JSON.parse(about.fullBio) : about.fullBio;
 
   return (
     <main className="container py-12 md:py-24 lg:py-32">
@@ -53,8 +59,8 @@ export default async function AboutPage() {
         </div>
 
         <div className="prose prose-gray dark:prose-invert max-w-none">
-          {about?.fullBio ? (
-            <PortableText value={about.fullBio} />
+          {parsedFullBio ? (
+            <PortableText value={parsedFullBio} />
           ) : (
             <p>
               I'm a passionate software developer with expertise in modern web
