@@ -28,7 +28,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
+import { TiptapEditor } from '@/components/tiptap-editor'
+import { parseContent, stringifyContent } from '@/lib/tiptap-content'
 import { MultiSelect } from "@/components/admin/multi-select";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { createPost, updatePost } from "@/lib/actions";
@@ -51,7 +52,7 @@ const formSchema = z.object({
     .string()
     .min(10, "Excerpt must be at least 10 characters.")
     .max(200, "Excerpt must be less than 200 characters."),
-  content: z.string().min(50, "Content must be at least 50 characters."),
+  content: z.any(), // Accept JSON object for Tiptap content
   mainImage: z.string().optional(),
   categories: z.array(z.string()).min(1, "At least one category is required."),
   status: z.enum(["draft", "published"]),
@@ -118,29 +119,63 @@ export function PostForm({ post = null, categories = [] }) {
     const errors = [];
 
     if (content) {
-      // Check for minimum content length (excluding HTML tags)
-      const textContent = content.replace(/<[^>]*>/g, "");
-      if (textContent.length < 50) {
-        errors.push("Content text should be at least 50 characters.");
+      try {
+        // For JSON content, we need to analyze the structure
+        const jsonContent = typeof content === 'string' 
+          ? JSON.parse(content) 
+          : content;
+        
+        // Check if there's content in the document
+        const hasContent = jsonContent?.content?.length > 0;
+        
+        // Find text nodes and count characters
+        let textLength = 0;
+        let hasImage = false;
+        let hasHeadings = false;
+        
+        // Recursive function to traverse the JSON structure
+        const traverse = (node) => {
+          if (node.type === 'text' && node.text) {
+            textLength += node.text.length;
+          }
+          
+          if (node.type === 'image') {
+            hasImage = true;
+          }
+          
+          if (node.type === 'heading' && (node.attrs?.level === 2 || node.attrs?.level === 3)) {
+            hasHeadings = true;
+          }
+          
+          if (node.content && Array.isArray(node.content)) {
+            node.content.forEach(traverse);
+          }
+        };
+        
+        if (hasContent) {
+          jsonContent.content.forEach(traverse);
+        }
+        
+        // Apply validation rules
+        if (textLength < 50) {
+          errors.push("Content text should be at least 50 characters.");
+        }
+        
+        if (!hasImage && form.watch("status") === "published") {
+          errors.push("Published posts should include at least one image.");
+        }
+        
+        if (!hasHeadings && textLength > 500) {
+          errors.push(
+            "Longer posts should include headings (h2 or h3) for better readability."
+          );
+        }
+      } catch (error) {
+        console.error("Error validating content:", error);
+        errors.push("Invalid content format");
       }
     }
-
-    // Check for images
-    if (!content.includes("<img") && form.watch("status") === "published") {
-      errors.push("Published posts should include at least one image.");
-    }
-
-    // Check for headings
-    if (
-      !content.includes("<h2") &&
-      !content.includes("<h3") &&
-      content.length > 500
-    ) {
-      errors.push(
-        "Longer posts should include headings (h2 or h3) for better readability."
-      );
-    }
-
+    
     setValidationErrors(errors);
   }, [form.watch("content"), form.watch("status"), form]);
 
@@ -214,9 +249,12 @@ export function PostForm({ post = null, categories = [] }) {
                   <FormControl>
                     <Card>
                       <CardContent className="p-0">
-                        <SimpleEditor
+                        <TiptapEditor
                           content={field.value ?? ""}
-                          onChange={field.onChange}
+                          onChange={(jsonContent) => {
+                            // Store the JSON content directly
+                            field.onChange(jsonContent);
+                          }}
                         />
                       </CardContent>
                     </Card>
