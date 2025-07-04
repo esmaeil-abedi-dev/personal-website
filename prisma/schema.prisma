@@ -25,7 +25,7 @@ model Post {
   title       String
   slug        String     @unique
   excerpt     String
-  content     String     @db.Text
+  content     Json       // Changed from String to Json to store structured editor content
   mainImage   String?
   status      String     @default("draft") // "draft" or "published"
   publishedAt DateTime?
@@ -49,7 +49,7 @@ model Experience {
   position     String
   startDate    String
   endDate      String?
-  description  String
+  description  Json     // Changed from String to Json to store structured editor content
   technologies String[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -78,7 +78,7 @@ model SkillCategory {
 model About {
   id        String   @id @default("1") // Only one record
   shortBio  String
-  fullBio   String   @db.Text
+  fullBio   Json     // Changed from String to Json to store structured editor content
   image     String?
   updatedAt DateTime @updatedAt
 }
@@ -88,7 +88,7 @@ model Project {
   title        String
   slug         String   @unique
   description  String
-  content      String   @db.Text
+  content      Json     // Changed from String to Json to store structured editor content
   image        String?
   demoUrl      String?
   githubUrl    String?
