@@ -1,7 +1,7 @@
 "use client"
 import { useTheme } from "next-themes"
 import { useEditor, EditorContent } from '@tiptap/react'
-import { parseContent, isTiptapContent } from '@/lib/tiptap-content'
+import { parseContent, isTiptapContent, safeContentParser } from '@/lib/tiptap-content'
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -19,7 +19,8 @@ import { Link } from "@/components/tiptap-extension/link-extension"
 export function PortableText({ value }: { value: any }) {
   const { theme } = useTheme()
   
-  const parsedContent = parseContent(value)
+  // Use the safe content parser for compatibility during migration
+  const parsedContent = safeContentParser(value)
   
   // Create a read-only editor to render the content
   const editor = useEditor({
@@ -41,6 +42,10 @@ export function PortableText({ value }: { value: any }) {
   })
 
   if (!editor) {
+    // If direct HTML is detected (before migration completes), render it directly
+    if (typeof value === "string" && value.trim().startsWith("<")) {
+      return <div dangerouslySetInnerHTML={{ __html: value }} />
+    }
     return <div>Loading content...</div>
   }
 
