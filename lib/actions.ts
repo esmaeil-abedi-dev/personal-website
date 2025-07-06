@@ -24,17 +24,12 @@ function hashPassword(password: string) {
 export async function createPost(data) {
   await checkAuth();
 
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
-
   const post = await prisma.post.create({
     data: {
       title: data.title,
       slug: data.slug,
       excerpt: data.excerpt,
-      content, // Store as JSON directly
+      content: data.content,
       mainImage: data.mainImage,
       status: data.status,
       publishedAt:
@@ -56,18 +51,13 @@ export async function createPost(data) {
 export async function updatePost(id, data) {
   await checkAuth();
 
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
-
   const post = await prisma.post.update({
     where: { id },
     data: {
       title: data.title,
       slug: data.slug,
       excerpt: data.excerpt,
-      content, // Store as JSON directly
+      content: data.content,
       mainImage: data.mainImage,
       status: data.status,
       publishedAt:
@@ -102,11 +92,6 @@ export async function deletePost(id) {
 // Experience
 export async function createExperience(data) {
   await checkAuth();
-  
-  // Ensure description is properly structured as JSON
-  const description = typeof data.description === 'string' 
-    ? JSON.parse(data.description) 
-    : data.description;
 
   const experience = await prisma.experience.create({
     data: {
@@ -114,7 +99,7 @@ export async function createExperience(data) {
       position: data.position,
       startDate: data.startDate,
       endDate: data.endDate,
-      description, // Store as JSON directly
+      description: data.description,
       technologies: data.technologies,
     },
   });
@@ -126,11 +111,6 @@ export async function createExperience(data) {
 
 export async function updateExperience(id, data) {
   await checkAuth();
-  
-  // Ensure description is properly structured as JSON
-  const description = typeof data.description === 'string' 
-    ? JSON.parse(data.description) 
-    : data.description;
 
   const experience = await prisma.experience.update({
     where: { id },
@@ -139,7 +119,7 @@ export async function updateExperience(id, data) {
       position: data.position,
       startDate: data.startDate,
       endDate: data.endDate,
-      description, // Store as JSON directly
+      description: data.description,
       technologies: data.technologies,
     },
   });
@@ -210,23 +190,18 @@ export async function deleteSkillCategory(id) {
 // About Page
 export async function updateAboutPage(data) {
   await checkAuth();
-  
-  // Ensure fullBio is properly structured as JSON
-  const fullBio = typeof data.fullBio === 'string' 
-    ? JSON.parse(data.fullBio) 
-    : data.fullBio;
 
   const about = await prisma.about.upsert({
     where: { id: "1" }, // Assuming there's only one about page
     update: {
       shortBio: data.shortBio,
-      fullBio, // Store as JSON directly
+      fullBio: data.fullBio,
       image: data.image,
     },
     create: {
       id: "1",
       shortBio: data.shortBio,
-      fullBio, // Store as JSON directly
+      fullBio: data.fullBio,
       image: data.image,
     },
   });
@@ -256,18 +231,13 @@ export async function uploadImage(file) {
 // Projects
 export async function createProject(data) {
   await checkAuth();
-  
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
 
   const project = await prisma.project.create({
     data: {
       title: data.title,
       slug: data.slug,
       description: data.description,
-      content, // Store as JSON directly
+      content: data.content,
       image: data.image,
       demoUrl: data.demoUrl,
       githubUrl: data.githubUrl,
@@ -284,11 +254,6 @@ export async function createProject(data) {
 
 export async function updateProject(id, data) {
   await checkAuth();
-  
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
 
   const project = await prisma.project.update({
     where: { id },
@@ -296,7 +261,7 @@ export async function updateProject(id, data) {
       title: data.title,
       slug: data.slug,
       description: data.description,
-      content, // Store as JSON directly
+      content: data.content,
       image: data.image,
       demoUrl: data.demoUrl,
       githubUrl: data.githubUrl,

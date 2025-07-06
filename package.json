@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "migrate:json": "node scripts/migrate-to-json.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "@auth/core": "latest",
