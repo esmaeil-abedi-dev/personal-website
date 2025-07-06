@@ -185,7 +185,7 @@ const MobileToolbarContent = ({
 
 type SimpleEditorProps = {
   content?: string | object
-  onChange?: (content: string) => void
+  onChange?: (content: object) => void
   imageUploadHandler?: (file: File) => Promise<string>
   onError?: (error: Error) => void
 }
@@ -234,7 +234,7 @@ export function SimpleEditor({ content = "", onChange, imageUploadHandler, onErr
     content: content,
     onUpdate({ editor }) {
       if (onChange) {
-        onChange(editor.getHTML())
+        onChange(editor.getJSON())
       }
     },
   })
