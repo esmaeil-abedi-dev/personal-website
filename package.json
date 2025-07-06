@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate:json": "node scripts/migrate-to-json.js",
-    "prepare:json-migration": "node scripts/prepare-json-migration.js"
+    "migrate:json": "node scripts/migrate-to-json.js"
   },
   "dependencies": {
     "@auth/core": "latest",
