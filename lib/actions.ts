@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getServerAuthSession } from "@/lib/auth";
+import { safeContentParser } from "@/lib/tiptap-content";
 
 // Authentication check
 async function checkAuth() {
@@ -24,10 +25,8 @@ function hashPassword(password: string) {
 export async function createPost(data) {
   await checkAuth();
 
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
+  // Ensure content is properly structured as JSON using our safe parser
+  const content = safeContentParser(data.content);
 
   const post = await prisma.post.create({
     data: {
@@ -56,10 +55,8 @@ export async function createPost(data) {
 export async function updatePost(id, data) {
   await checkAuth();
 
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
+  // Ensure content is properly structured as JSON using our safe parser
+  const content = safeContentParser(data.content);
 
   const post = await prisma.post.update({
     where: { id },
@@ -103,10 +100,8 @@ export async function deletePost(id) {
 export async function createExperience(data) {
   await checkAuth();
   
-  // Ensure description is properly structured as JSON
-  const description = typeof data.description === 'string' 
-    ? JSON.parse(data.description) 
-    : data.description;
+  // Ensure description is properly structured as JSON using our safe parser
+  const description = safeContentParser(data.description);
 
   const experience = await prisma.experience.create({
     data: {
@@ -127,10 +122,8 @@ export async function createExperience(data) {
 export async function updateExperience(id, data) {
   await checkAuth();
   
-  // Ensure description is properly structured as JSON
-  const description = typeof data.description === 'string' 
-    ? JSON.parse(data.description) 
-    : data.description;
+  // Ensure description is properly structured as JSON using our safe parser
+  const description = safeContentParser(data.description);
 
   const experience = await prisma.experience.update({
     where: { id },
@@ -211,10 +204,8 @@ export async function deleteSkillCategory(id) {
 export async function updateAboutPage(data) {
   await checkAuth();
   
-  // Ensure fullBio is properly structured as JSON
-  const fullBio = typeof data.fullBio === 'string' 
-    ? JSON.parse(data.fullBio) 
-    : data.fullBio;
+  // Ensure fullBio is properly structured as JSON using our safe parser
+  const fullBio = safeContentParser(data.fullBio);
 
   const about = await prisma.about.upsert({
     where: { id: "1" }, // Assuming there's only one about page
@@ -257,10 +248,8 @@ export async function uploadImage(file) {
 export async function createProject(data) {
   await checkAuth();
   
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
+  // Ensure content is properly structured as JSON using our safe parser
+  const content = safeContentParser(data.content);
 
   const project = await prisma.project.create({
     data: {
@@ -285,10 +274,8 @@ export async function createProject(data) {
 export async function updateProject(id, data) {
   await checkAuth();
   
-  // Ensure content is properly structured as JSON
-  const content = typeof data.content === 'string' 
-    ? JSON.parse(data.content) 
-    : data.content;
+  // Ensure content is properly structured as JSON using our safe parser
+  const content = safeContentParser(data.content);
 
   const project = await prisma.project.update({
     where: { id },
